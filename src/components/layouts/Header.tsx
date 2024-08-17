@@ -9,16 +9,12 @@ const Header:React.FC = ()=>{
     <div className="col-auto">
       <div className="d-flex flex-wrap align-items-center gap-4">
         <button type="button" className="sidebar-toggle">
-          <iconify-icon icon="heroicons:bars-3-solid" className="icon text-2xl non-active"></iconify-icon> 
-          <iconify-icon icon="iconoir:arrow-right" className="icon text-2xl active"></iconify-icon>
+          <iconify-icon icon="heroicons:bars-3-solid" id="desktop-big-view-toggle" className="icon text-2xl non-active"></iconify-icon>
+          <iconify-icon icon="iconoir:arrow-right" id="desktop-small-view-toggle" style={{display:'none'}} className="icon text-2xl active"></iconify-icon>
         </button>
         <button type="button" className="sidebar-mobile-toggle">
           <iconify-icon icon="heroicons:bars-3-solid" className="icon"></iconify-icon>2
         </button>
-        <form className="navbar-search">
-          <input type="text" name="search" placeholder="Search"/>
-          <iconify-icon icon="ion:search-outline" className="icon"></iconify-icon>
-        </form>
       </div>
     </div>
     <div className="col-auto">

@@ -3,6 +3,10 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import $ from 'jquery';
+import store from './redux/store'; 
+import { Provider } from 'react-redux';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 $(document).ready(() => {
   $(".sidebar-menu .dropdown").on("click", function(){
@@ -18,8 +22,20 @@ $(document).ready(() => {
     item.toggleClass("dropdown-open");
   });
 
-  $(".sidebar-toggle").on("click", function(){
-    $(this).toggleClass("active");
+  $("#desktop-big-view-toggle").on("click", function(){
+    $("#desktop-big-view-toggle").hide();
+    $("#main-layouts").removeClass('grid-container')
+    $("#main-layouts").addClass('mobile-grid-container')
+    $("#desktop-small-view-toggle").show();
+    $(".sidebar").toggleClass("active");
+    $(".dashboard-main").toggleClass("active");
+  });
+
+  $("#desktop-small-view-toggle").on("click", function(){
+    $("#desktop-big-view-toggle").show();
+    $("#main-layouts").addClass('grid-container')
+    $("#main-layouts").removeClass('mobile-grid-container')
+    $("#desktop-small-view-toggle").hide();
     $(".sidebar").toggleClass("active");
     $(".dashboard-main").toggleClass("active");
   });
@@ -48,8 +64,11 @@ $(document).ready(() => {
     const newCta = isDark ? "dark" : "light";
     // use an aria-label if you are omitting text on the button
     // and using a sun/moon icon, for example
-    buttonEl.setAttribute("aria-label", newCta);
-    buttonEl.innerText = newCta;
+    if(buttonEl){
+      buttonEl.setAttribute("aria-label", newCta);
+      buttonEl.innerText = newCta;
+    }
+    
   }
   
   /**
@@ -102,7 +121,10 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <App />
+    <Provider store={store}>
+    <ToastContainer />
+      <App />
+  </Provider>,
   </React.StrictMode>
 );
 

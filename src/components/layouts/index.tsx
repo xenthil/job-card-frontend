@@ -10,7 +10,7 @@ import './style.css'
 const Layouts:React.FC = ()=>{
     return (
         <>
-          <div className="layout grid-container">
+          <div id="main-layouts" className="layout grid-container">
             <div className="header"><Header/></div>
             <div className="sideBar"><SideBar/></div>
             <div className="main"><Outlet/></div>

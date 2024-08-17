@@ -1,5 +1,7 @@
-import React from 'react';
+import React,{ lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+// import Loadable from './components/Loadable'
+// const Login = Loadable(lazy(() => import('./pages/Login')));
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Home from './pages/Home'
@@ -7,6 +9,7 @@ import NotFound from './pages/NotFound'
 import Client from './pages/client/Client'
 import AddAndEditClient from './pages/client/AddAndEditClient'
 import ProtectedRoute from './utils/ProtectedRoute'
+
 
 import './App.css';
 
