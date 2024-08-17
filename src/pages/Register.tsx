@@ -68,9 +68,6 @@ const Register:React.FC = ()=>{
                 toast.success(response?.message);
                 setServerError([])
                 navigate('/login')
-                // setTimeout(()=>{
-                //   navigate('/login')
-                // },1000)
               }else{
                 setServerError(response?.data)
               }
@@ -116,7 +113,7 @@ const Register:React.FC = ()=>{
                         </a>
                         <h4 className="mb-12">Sign Up</h4>
                     </div>
-                    {AlertComponent?.length > 0 && <AlertComponent serverError={serverError}/>}
+                    {serverError?.length > 0 && <AlertComponent serverError={serverError}/>}
                     <form onSubmit={handleSubmit}>
                         <div className="icon-field mb-16">
                             <span className="icon top-50 translate-middle-y">
