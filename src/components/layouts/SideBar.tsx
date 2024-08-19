@@ -1,5 +1,6 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
+import './sidebar.css'
 
 const SideBar: React.FC = () => {
   return (
@@ -30,101 +31,67 @@ const SideBar: React.FC = () => {
         <div className="sidebar-menu-area">
           <ul className="sidebar-menu" id="sidebar-menu">
             <li className="">
-              <Link to="/">
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  `menu-link ${isActive ? "active" : ""}`
+                }
+              >
                 <iconify-icon
                   icon="solar:home-smile-angle-outline"
                   className="menu-icon"
                 ></iconify-icon>
                 <span>&nbsp;&nbsp;Dashboard</span>
-              </Link>
-              {/* <ul className="sidebar-submenu">
-                <li>
-                  <a href="index.html">
-                    <i className="ri-circle-fill circle-icon text-primary-600 w-auto"></i>
-                    Home
-                  </a>
-                </li>
-              </ul> */}
+              </NavLink>
             </li>
 
-            {/* <li className="dropdown">
-              <Link to="/">
-                <iconify-icon
-                  icon="hugeicons:invoice-03"
-                  className="menu-icon"
-                ></iconify-icon>
-                <span>Invoice</span>
-              </Link>
-              <ul className="sidebar-submenu">
-                <li>
-                  <a href="invoice-list.html">
-                    <i className="ri-circle-fill circle-icon text-primary-600 w-auto"></i>{" "}
-                    List
-                  </a>
-                </li>
-                <li>
-                  <a href="invoice-preview.html">
-                    <i className="ri-circle-fill circle-icon text-warning-main w-auto"></i>{" "}
-                    Preview
-                  </a>
-                </li>
-                <li>
-                  <a href="invoice-add.html">
-                    <i className="ri-circle-fill circle-icon text-info-main w-auto"></i>{" "}
-                    Add new
-                  </a>
-                </li>
-                <li>
-                  <a href="invoice-edit.html">
-                    <i className="ri-circle-fill circle-icon text-danger-main w-auto"></i>{" "}
-                    Edit
-                  </a>
-                </li>
-              </ul>
-            </li> */}
-
-            {/* <li className="sidebar-menu-group-title">Jobs</li> */}
-
-            <li className="dropdown">
-              <Link to="/client">
-                <iconify-icon
-                  icon="heroicons:document"
-                  className="menu-icon"
-                ></iconify-icon>
-                <span> &nbsp;&nbsp;Clients</span>
-              </Link>
-              <ul className="sidebar-submenu">
-                <li>
-                  <Link to="client">
-                    <i className="ri-circle-fill circle-icon text-primary-600 w-auto"></i>
-                    Client
-                  </Link>
-                </li>
-                <li>
-                  <Link to="material_inward">
-                    <i className="ri-circle-fill circle-icon text-primary-600 w-auto"></i>
-                    Material Inward
-                  </Link>
-                </li>
-                <li>
-                  <Link to="production_details">
-                    <i className="ri-circle-fill circle-icon text-success-main w-auto"></i>{" "}
-                    Production Details
-                  </Link>
-                </li>
-                <li>
-                  <Link to="filing_details">
-                    <i className="ri-circle-fill circle-icon text-success-main w-auto"></i>{" "}
-                    Filing Details
-                  </Link>
-                </li>
-                <li>
-                  <Link to="dispatch_details">
-                    <i className="ri-circle-fill circle-icon text-success-main w-auto"></i>{" "}
-                    Dispatch Details
-                  </Link>
-                </li>
-              </ul>
+            <li>
+              <NavLink to="client" className={({ isActive }) =>
+                  `menu-link ${isActive ? "active" : ""}`
+                }>
+                <iconify-icon icon="mdi:user-outline"></iconify-icon>
+                &nbsp;&nbsp; Client
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="material_inward" className={({ isActive }) =>
+                  `menu-link ${isActive ? "active" : ""}`
+                }>
+                <iconify-icon icon="lets-icons:materials"></iconify-icon>
+                &nbsp;&nbsp;Material Inward
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="production_details" className={({ isActive }) =>
+                  `menu-link ${isActive ? "active" : ""}`
+                }>
+                <iconify-icon icon="eos-icons:products"></iconify-icon>
+                &nbsp;&nbsp;Production Details
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="filing_details" className={({ isActive }) =>
+                  `menu-link ${isActive ? "active" : ""}`
+                }>
+                <iconify-icon icon="mdi:filing-cabinet"></iconify-icon>
+                &nbsp;&nbsp; Filing Details
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="dispatch_details" className={({ isActive }) =>
+                  `menu-link ${isActive ? "active" : ""}`
+                }>
+                <iconify-icon icon="iconamoon:delivery-fast-thin"></iconify-icon>
+                &nbsp;&nbsp;Dispatch Details
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="dispatch_details" className={({ isActive }) =>
+                  `menu-link ${isActive ? "active" : ""}`
+                }>
+                <iconify-icon icon="uiw:logout"></iconify-icon>
+                &nbsp;&nbsp; Logout
+              </NavLink>
             </li>
 
             {/* <li className="dropdown">

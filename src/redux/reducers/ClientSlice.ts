@@ -55,7 +55,7 @@ export const getSupplier = createAsyncThunk(
     'client/getClient',
     async (userData:any,{ rejectWithValue }) => {
       try{
-        let response = await api.post('/client/getClient')
+        let response = await api.post('/client/getClient?'+userData)
         return response.data; 
       }catch(error:any){
         if (error.response) {
@@ -74,6 +74,7 @@ const clientSlice = createSlice({
   initialState: {
     isLoading : false,
     supplier : [],
+    count : 0,
     message : {}
   },
   reducers : {
@@ -90,7 +91,8 @@ const clientSlice = createSlice({
     }).addCase(addSupplier.pending, (state, action) => {
       state.isLoading = true; 
     }).addCase(getSupplier.fulfilled, (state, action) => {
-        state.supplier = action.payload.data;
+        state.supplier = action.payload.data.client;
+        state.count = action.payload.data.count;
         state.isLoading = false; 
     }).addCase(editSupplier.fulfilled, (state, action) => {
         state.isLoading = false; 

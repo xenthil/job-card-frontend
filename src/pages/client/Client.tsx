@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from "react";
 import Pagination from "../../components/Pagination";
-import { Link ,useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getSupplier, addMessage,removeSupplier } from "../../redux/reducers/ClientSlice";
+import {
+  getSupplier,
+  addMessage,
+  removeSupplier,
+} from "../../redux/reducers/ClientSlice";
 import { AppDispatch, RootState } from "../../redux/store";
 import { toast } from "react-toastify";
 import PageLoader from "../../components/PageLoader";
-import DynamicTable  from '../../components/DynamicTable'
-import { Column } from 'react-table';
-import ModalComponent  from '../../components/ModalComponent'
+import DynamicTable from "../../components/DynamicTable";
+import { Column } from "react-table";
+import ModalComponent from "../../components/ModalComponent";
 
 interface Address {
   id: number;
@@ -36,13 +40,16 @@ interface Clients {
   address: Address[];
 }
 
-
 const Client: React.FC = () => {
   const data = useSelector((state: RootState) => state.client.supplier);
+  const count = useSelector((state: RootState) => state.client.count);
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
   const [deletedData, setDeletedData] = useState<any>([]);
+  const [pageSize, setPageSize] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const columns: Column<Clients>[] = React.useMemo(
     () => [
@@ -70,12 +77,16 @@ const Client: React.FC = () => {
     []
   );
 
+  const handlePagination = (page: number) => {
+    setCurrentPage(page);
+  };
+
   const handleEdit = (row: Clients) => {
-    navigate('/editClient', { state: row});
+    navigate("/editClient", { state: row });
   };
 
   const handleDelete = (row: Clients) => {
-    setDeletedData(row)
+    setDeletedData(row);
     setModalOpen(true);
   };
 
@@ -85,34 +96,18 @@ const Client: React.FC = () => {
 
   const handleSaveChanges = () => {
     setModalOpen(false);
-    let data:any = {clientId :deletedData?.id,addressId : deletedData?.address?.[0]?.id } 
+    let data: any = {
+      clientId: deletedData?.id,
+      addressId: deletedData?.address?.[0]?.id,
+    };
     dispatch(removeSupplier(data))
       .unwrap()
       .then((response: any) => {
-        console.log("API response:", response);
         if (response?.status === 200 || response?.status === 201) {
           toast.success(response?.message);
-          getSupplierData()
+          getSupplierData();
         } else {
           toast.error(response?.message);
-        }
-      })
-      .catch((err: any) => {
-        console.error("API call error:", err);
-        dispatch(addMessage({ error: err }));
-      });
-    
-  };
-
-  const getSupplierData = () => {
-    dispatch(getSupplier({}))
-      .unwrap()
-      .then((response: any) => {
-        console.log("API response:", response);
-        if (response?.status === 200 || response?.status === 201) {
-          toast.success(response?.message);
-        } else {
-          // Handle other status codes if needed
         }
       })
       .catch((err: any) => {
@@ -123,7 +118,36 @@ const Client: React.FC = () => {
 
   useEffect(() => {
     getSupplierData();
-  }, [dispatch]);
+  }, [currentPage, pageSize]);
+
+  useEffect(() => {
+    if (data.length > 0) {
+      let page = Math.ceil(count / pageSize);
+      setTotalPages(page);
+    }
+  }, [data, pageSize]);
+
+  const getSupplierData = () => {
+    let query = `page=${currentPage}&limit=${pageSize}`
+    dispatch(getSupplier(query))
+      .unwrap()
+      .then((response: any) => {
+        console.log("API response:", response);
+        if (response?.status === 200 || response?.status === 201) {
+          // toast.success(response?.message);
+        } else {
+          toast.error(response?.message);
+        }
+      })
+      .catch((err: any) => {
+        console.error("API call error:", err);
+        dispatch(addMessage({ error: err }));
+      });
+  };
+
+  useEffect(() => {
+    getSupplierData();
+  }, []);
 
   return (
     <>
@@ -146,20 +170,29 @@ const Client: React.FC = () => {
             <h5 className="card-title mb-0">Client informations</h5>
           </div>
           <div className="card-body">
-          <DynamicTable columns={columns} data={data} onEdit={handleEdit} onDelete={handleDelete} />
+            <DynamicTable
+              columns={columns}
+              data={data}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
             <br></br>
-            <div>
-              <Pagination />
+            <div className="pagination">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={(page) => handlePagination(page)}
+              />
             </div>
           </div>
         </div>
-            <ModalComponent
-            show={modalOpen}
-            title="Are you Sure"
-            body="Do you want to remove ?"
-            onClose={handleCloseModal}
-            onSave={handleSaveChanges}
-          />
+        <ModalComponent
+          show={modalOpen}
+          title="Are you Sure"
+          body="Do you want to remove ?"
+          onClose={handleCloseModal}
+          onSave={handleSaveChanges}
+        />
       </div>
     </>
   );
