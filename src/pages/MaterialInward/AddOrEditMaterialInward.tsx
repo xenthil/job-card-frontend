@@ -556,7 +556,7 @@ const AddAndEditMaterialInward: React.FC = () => {
                           DC Image &#8203; 
                           {editData?.dcImage ? (
                             <span>
-                              <a
+                              <a target="_blank"
                                 href={`${process.env.REACT_APP_BACKEND_FILE_URL}/materialInwards/1724748362096.pdf`}
                                 download
                               >
