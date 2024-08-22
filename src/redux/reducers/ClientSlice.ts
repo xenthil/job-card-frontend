@@ -67,6 +67,22 @@ export const getSupplier = createAsyncThunk(
     }
   )
 
+  export const getAllSupplier = createAsyncThunk(
+    'client/getAllClient',
+    async (userData:any,{ rejectWithValue }) => {
+      try{
+        let response = await api.post('/client/getAllClient')
+        return response.data; 
+      }catch(error:any){
+        if (error.response) {
+          return rejectWithValue(error.response.data);
+        } else {
+          return rejectWithValue({ message: 'Network error' });
+        }
+      }  
+    }
+  )
+
 
 
 const clientSlice = createSlice({
@@ -74,6 +90,7 @@ const clientSlice = createSlice({
   initialState: {
     isLoading : false,
     supplier : [],
+    allSupplier : [],
     count : 0,
     message : {}
   },
@@ -98,6 +115,9 @@ const clientSlice = createSlice({
         state.isLoading = false; 
     }).addCase(removeSupplier.fulfilled, (state, action) => {
         state.isLoading = false; 
+    }).addCase(getAllSupplier.fulfilled, (state, action) => {
+       state.allSupplier = action.payload.data.client
+       state.isLoading = false; 
     }) 
     
   },

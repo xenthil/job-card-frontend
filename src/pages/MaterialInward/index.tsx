@@ -3,10 +3,10 @@ import Pagination from "../../components/Pagination";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  getSupplier,
+  getMaterialInward,
   addMessage,
-  removeSupplier,
-} from "../../redux/reducers/ClientSlice";
+  removeMaterialInward,
+} from "../../redux/reducers/materialSlice";
 import { AppDispatch, RootState } from "../../redux/store";
 import { toast } from "react-toastify";
 import PageLoader from "../../components/PageLoader";
@@ -14,21 +14,18 @@ import DynamicTable from "../../components/DynamicTable";
 import { Column } from "react-table";
 import ModalComponent from "../../components/ModalComponent";
 
-interface Address {
-  id: number;
-  clientId: number;
-  email: string;
-  contact: string;
-  address: string;
-  area: string;
-  city: string;
-  pincode: string;
-  contactPersonName: string;
-  contactPersonContact: string;
-  description: string;
-  status: boolean;
-  createdAt: string;
-  updatedAt: string;
+interface MaterialInward {
+  client: Clients;
+  quantity: number;
+  noOfMaterials: number;
+  dcNumber: number;
+  dcImage: string;
+  receivedDate: string;
+  estimatedDispatchDate: string;
+  isQtyApproved: string;
+  coatingRequired: string;
+  jobType: string;
+  inspection: string;
 }
 
 interface Clients {
@@ -37,12 +34,12 @@ interface Clients {
   status: boolean;
   createdAt: string;
   updatedAt: string;
-  address: Address[];
 }
 
-const Client: React.FC = () => {
-  const data = useSelector((state: RootState) => state.client.supplier);
-  const count = useSelector((state: RootState) => state.client.count);
+
+const MaterialInwards: React.FC = () => {
+  const data = useSelector((state: RootState) => state.clientMaterial.materialInward);
+  const count = useSelector((state: RootState) => state.clientMaterial.count);
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
@@ -51,41 +48,48 @@ const Client: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const columns: Column<Clients>[] = React.useMemo(
+  const columns: Column<MaterialInward>[] = React.useMemo(
     () => [
       {
         Header: "Client Name",
-        accessor: "clientName",
+        accessor: (row) => row.client.clientName || "N/A",
       },
       {
-        Header: "Address",
-        accessor: (row: any) => row.address[0]?.address || "N/A",
+        Header: "Dc Number",
+        accessor: "dcNumber",
       },
       {
-        Header: "City",
-        accessor: (row: any) => row.address[0]?.city || "N/A",
+        Header: "Quantity",
+        accessor: "quantity",
       },
       {
-        Header: "Contact Person",
-        accessor: (row) => row.address[0]?.contactPersonName || "N/A",
+        Header: "Received Date",
+        accessor: (row) => {
+          const receivedDate = new Date(row.receivedDate);
+          return isNaN(receivedDate.getTime()) ? "N/A" : receivedDate.toISOString().slice(0, 10);
+        },
       },
       {
-        Header: "Contact Person Contact",
-        accessor: (row) => row.address[0]?.contactPersonContact || "N/A",
+        Header: "Estimated Dispatch Date",
+        accessor: (row) => {
+          const estimatedDispatchDate = new Date(row.estimatedDispatchDate);
+          return isNaN(estimatedDispatchDate.getTime()) ? "N/A" : estimatedDispatchDate.toISOString().slice(0, 10);
+        },
       },
     ],
     []
   );
+  
 
   const handlePagination = (page: number) => {
     setCurrentPage(page);
   };
 
-  const handleEdit = (row: Clients) => {
-    navigate("/editClient", { state: row });
+  const handleEdit = (row: MaterialInward) => {
+    navigate("/edit_material_inward", { state: row });
   };
 
-  const handleDelete = (row: Clients) => {
+  const handleDelete = (row: MaterialInward) => {
     setDeletedData(row);
     setModalOpen(true);
   };
@@ -97,10 +101,9 @@ const Client: React.FC = () => {
   const handleSaveChanges = () => {
     setModalOpen(false);
     let data: any = {
-      clientId: deletedData?.id,
-      addressId: deletedData?.address?.[0]?.id,
+      materialInwardId: deletedData?.id,
     };
-    dispatch(removeSupplier(data))
+    dispatch(removeMaterialInward(data))
       .unwrap()
       .then((response: any) => {
         if (response?.status === 200 || response?.status === 201) {
@@ -129,7 +132,7 @@ const Client: React.FC = () => {
 
   const getSupplierData = () => {
     let query = `page=${currentPage}&limit=${pageSize}`
-    dispatch(getSupplier(query))
+    dispatch(getMaterialInward(query))
       .unwrap()
       .then((response: any) => {
         console.log("API response:", response);
@@ -153,21 +156,19 @@ const Client: React.FC = () => {
     <>
       <div className="dashboard-main-body">
         <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
-          <h6 className="fw-semibold mb-0">Client</h6>
+          <h6 className="fw-semibold mb-0">Material Inward</h6>
           <ul className="d-flex align-items-center gap-2">
             <li className="fw-medium">
-              {" "}
-              <Link to="/addClient" className="btn btn-primary">
-                {" "}
-                Add client
-              </Link>{" "}
+              <Link to="/add_material_inward" className="btn btn-primary">
+                Add Material Inward
+              </Link>
             </li>
           </ul>
         </div>
 
         <div className="card basic-data-table">
           <div className="card-header">
-            <h5 className="card-title mb-0">Client informations</h5>
+            <h5 className="card-title mb-0">Material inward informations</h5>
           </div>
           <div className="card-body">
             <DynamicTable
@@ -198,4 +199,4 @@ const Client: React.FC = () => {
   );
 };
 
-export default Client;
+export default MaterialInwards;

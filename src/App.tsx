@@ -6,8 +6,10 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Home from './pages/Home'
 import NotFound from './pages/NotFound'
-import Client from './pages/client/Client'
+import MaterialInward from './pages/MaterialInward'
 import AddAndEditClient from './pages/client/AddAndEditClient'
+import Client from './pages/client/Client'
+import AddOrEditMaterialInward from './pages/MaterialInward/AddOrEditMaterialInward'
 import ProtectedRoute from './utils/ProtectedRoute'
 
 
@@ -27,6 +29,9 @@ function App(): React.ReactElement {
                 <Route path="client" element={<Client/>} />
                 <Route path="addClient" element={<AddAndEditClient/>} />
                 <Route path="editClient" element={<AddAndEditClient/>} />
+                <Route path="material_inward" element={<MaterialInward/>} />
+                <Route path="add_material_inward" element={<AddOrEditMaterialInward/>} />
+                <Route path="edit_material_inward" element={<AddOrEditMaterialInward/>} />
              </Route>
              <Route path="*" element={<NotFound/>} />
           </Routes>

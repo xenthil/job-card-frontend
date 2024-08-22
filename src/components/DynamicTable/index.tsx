@@ -39,18 +39,18 @@ function DynamicTable<T extends object>({
                   <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
                 ))}
                 <td>
-                  <button
+                  <span
                     onClick={() => onEdit(row.original)}
                     className="btn btn-sm btn-primary"
                   >
-                    Edit
-                  </button>
-                  <button
+                    <iconify-icon icon="uil:edit"></iconify-icon>
+                  </span>&nbsp;
+                  <span
                     onClick={() => onDelete(row.original)}
                     className="btn btn-sm btn-danger"
                   >
-                    Delete
-                  </button>
+                    <iconify-icon icon="fluent:delete-28-filled"></iconify-icon>
+                  </span>
                 </td>
               </tr>
             );
