@@ -62,6 +62,14 @@ const SideBar: React.FC = () => {
               </NavLink>
             </li>
             <li>
+              <NavLink to="jobs" className={({ isActive }) =>
+                  `menu-link ${isActive ? "active" : ""}`
+                }>
+                <iconify-icon icon="hugeicons:new-job"></iconify-icon>
+                &nbsp;&nbsp;Jobs
+              </NavLink>
+            </li>
+            <li>
               <NavLink to="production_details" className={({ isActive }) =>
                   `menu-link ${isActive ? "active" : ""}`
                 }>
@@ -86,7 +94,7 @@ const SideBar: React.FC = () => {
               </NavLink>
             </li>
             <li>
-              <NavLink to="dispatch_details" className={({ isActive }) =>
+              <NavLink to="logout" className={({ isActive }) =>
                   `menu-link ${isActive ? "active" : ""}`
                 }>
                 <iconify-icon icon="uiw:logout"></iconify-icon>

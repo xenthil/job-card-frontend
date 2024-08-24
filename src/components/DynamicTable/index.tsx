@@ -4,8 +4,10 @@ import { useTable, Column } from "react-table";
 interface TableProps<T extends object> {
   columns: Column<T>[];
   data: T[];
-  onEdit: (row: T) => void;
-  onDelete: (row: T) => void;
+  onEdit?: (row: T) => void;
+  onDelete?: (row: T) => void;
+  editOption?: boolean;
+  deleteOption?: boolean;
 }
 
 function DynamicTable<T extends object>({
@@ -13,6 +15,8 @@ function DynamicTable<T extends object>({
   data,
   onEdit,
   onDelete,
+  editOption,
+  deleteOption,
 }: TableProps<T>) {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
@@ -39,18 +43,23 @@ function DynamicTable<T extends object>({
                   <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
                 ))}
                 <td>
-                  <span
-                    onClick={() => onEdit(row.original)}
-                    className="btn btn-sm btn-primary"
-                  >
-                    <iconify-icon icon="uil:edit"></iconify-icon>
-                  </span>&nbsp;
-                  <span
-                    onClick={() => onDelete(row.original)}
-                    className="btn btn-sm btn-danger"
-                  >
-                    <iconify-icon icon="fluent:delete-28-filled"></iconify-icon>
-                  </span>
+                  {(editOption && onEdit) && (
+                    <span
+                      onClick={() => onEdit(row.original)}
+                      className="btn btn-sm btn-primary"
+                    >
+                      <iconify-icon icon="uil:edit"></iconify-icon>
+                    </span>
+                  )}
+                  &nbsp;
+                  {(deleteOption && onDelete) && (
+                    <span
+                      onClick={() => onDelete(row.original)}
+                      className="btn btn-sm btn-danger"
+                    >
+                      <iconify-icon icon="fluent:delete-28-filled"></iconify-icon>
+                    </span>
+                  )}
                 </td>
               </tr>
             );

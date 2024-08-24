@@ -68,7 +68,7 @@ export const verifyToken = createAsyncThunk(
   'users/verify',
   async (token,{ dispatch, rejectWithValue }) => {
     try{
-      let response = await api.post('/auth/verify',token)
+      let response = await api.get('/auth/verify-token')
       return response.data; 
     }catch(error:any){
       if (error.response) {
@@ -103,16 +103,9 @@ const authSlice = createSlice({
     }).addCase(createUser.pending, (state, action) => {
       state.isLoading = true; 
     }).addCase(verifyToken.fulfilled, (state, action) => {
-      state.user = action.payload.user;
+      state.user = action.payload.data;
       state.isLoading = false;
-    })
-    .addCase(verifyToken.rejected, (state, action) => {
-      state.isLoading = false;
-    })
-    .addCase(verifyToken.pending, (state, action) => {
-      state.isLoading = true;
-    })
-    .addCase(logout.fulfilled, (state, action) => {
+    }).addCase(logout.fulfilled, (state, action) => {
       state.user = {};
       state.isLoading = false; 
     });

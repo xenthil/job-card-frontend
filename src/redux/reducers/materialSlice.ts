@@ -54,7 +54,7 @@ export const editMaterialInwardr = createAsyncThunk(
     }
   )
 
-
+  
 export const getMaterialInward = createAsyncThunk(
     'materialInward/get',
     async (userData:any,{ rejectWithValue }) => {
@@ -71,6 +71,168 @@ export const getMaterialInward = createAsyncThunk(
     }
   )
 
+  export const getJobs = createAsyncThunk(
+    'materialInward/getJobs',
+    async (userData:any,{ rejectWithValue }) => {
+      try{
+        let response = await api.get('/materialInward/jobs?'+userData)
+        return response.data; 
+      }catch(error:any){
+        if (error.response) {
+          return rejectWithValue(error.response.data);
+        } else {
+          return rejectWithValue({ message: 'Network error' });
+        }
+      }  
+    }
+  )
+
+  export const getProduction = createAsyncThunk(
+    'materialInward/getProduction',
+    async (userData:any,{ rejectWithValue }) => {
+      try{
+        let response = await api.get('/materialInward/getProduction?'+userData)
+        return response.data; 
+      }catch(error:any){
+        if (error.response) {
+          return rejectWithValue(error.response.data);
+        } else {
+          return rejectWithValue({ message: 'Network error' });
+        }
+      }  
+    }
+  )
+
+  
+  export const assignJob = createAsyncThunk(
+    'materialInward/assignJob',
+    async (userData:any,{ rejectWithValue }) => {
+      try{
+        let response = await api.post('/materialInward/assignJob',userData)
+        return response.data; 
+      }catch(error:any){
+        if (error.response) {
+          return rejectWithValue(error.response.data);
+        } else {
+          return rejectWithValue({ message: 'Network error' });
+        }
+      }  
+    }
+  )
+
+  export const assignFiling = createAsyncThunk(
+    'materialInward/assignFiling',
+    async (userData:any,{ rejectWithValue }) => {
+      try{
+        let response = await api.post('/materialInward/assignFiling',userData)
+        return response.data; 
+      }catch(error:any){
+        if (error.response) {
+          return rejectWithValue(error.response.data);
+        } else {
+          return rejectWithValue({ message: 'Network error' });
+        }
+      }  
+    }
+  )
+
+  export const forwardJob = createAsyncThunk(
+    'materialInward/forwardJob',
+    async (userData:any,{ rejectWithValue }) => {
+      try{
+        let response = await api.post('/materialInward/forwardJob',userData)
+        return response.data; 
+      }catch(error:any){
+        if (error.response) {
+          return rejectWithValue(error.response.data);
+        } else {
+          return rejectWithValue({ message: 'Network error' });
+        }
+      }  
+    }
+  )
+  
+  export const getFiling = createAsyncThunk(
+    'materialInward/getFiling',
+    async (userData:any,{ rejectWithValue }) => {
+      try{
+        let response = await api.get('/materialInward/getFiling?'+userData)
+        return response.data; 
+      }catch(error:any){
+        if (error.response) {
+          return rejectWithValue(error.response.data);
+        } else {
+          return rejectWithValue({ message: 'Network error' });
+        }
+      }  
+    }
+  )
+
+  export const toDispatch = createAsyncThunk(
+    'materialInward/toDispatch',
+    async (userData:any,{ rejectWithValue }) => {
+      try{
+        let response = await api.post('/materialInward/toDispatch',userData)
+        return response.data; 
+      }catch(error:any){
+        if (error.response) {
+          return rejectWithValue(error.response.data);
+        } else {
+          return rejectWithValue({ message: 'Network error' });
+        }
+      }  
+    }
+  )
+
+  export const forwardFiling = createAsyncThunk(
+    'materialInward/forwardFiling',
+    async (userData:any,{ rejectWithValue }) => {
+      try{
+        let response = await api.post('/materialInward/forwardFiling',userData)
+        return response.data; 
+      }catch(error:any){
+        if (error.response) {
+          return rejectWithValue(error.response.data);
+        } else {
+          return rejectWithValue({ message: 'Network error' });
+        }
+      }  
+    }
+  )
+
+  export const getDispatch = createAsyncThunk(
+    'materialInward/forwardFiling',
+    async (userData:any,{ rejectWithValue }) => {
+      try{
+        let response = await api.post('/materialInward/forwardFiling',userData)
+        return response.data; 
+      }catch(error:any){
+        if (error.response) {
+          return rejectWithValue(error.response.data);
+        } else {
+          return rejectWithValue({ message: 'Network error' });
+        }
+      }  
+    }
+  )
+
+  export const getDashboard = createAsyncThunk(
+    'materialInward/getDashboard',
+    async (userData:any,{ rejectWithValue }) => {
+      try{
+        let response = await api.get('/materialInward/getDashboard')
+        return response.data; 
+      }catch(error:any){
+        if (error.response) {
+          return rejectWithValue(error.response.data);
+        } else {
+          return rejectWithValue({ message: 'Network error' });
+        }
+      }  
+    }
+  )
+
+  
 
 
 const materialSlice = createSlice({
@@ -78,7 +240,16 @@ const materialSlice = createSlice({
   initialState: {
     isLoading : false,
     materialInward : [],
+    jobs : [],
+    production : [],
+    filing : [],
+    dispatch : [],
+    dashboardDetails : {},
     count : 0,
+    jobsCount : 0,
+    productionCount : 0,
+    filingCount : 0,
+    dispatchCount : 0,
     message : {}
   },
   reducers : {
@@ -98,9 +269,28 @@ const materialSlice = createSlice({
         state.isLoading = false; 
     }).addCase(removeMaterialInward.fulfilled, (state, action) => {
         state.isLoading = false; 
-    }) 
+    }).addCase(getJobs.fulfilled, (state, action) => {
+      state.jobs = action.payload.data.jobs;
+      state.jobsCount = action.payload.data.count;
+      state.isLoading = false; 
+    }).addCase(getProduction.fulfilled, (state, action) => {
+      state.production = action.payload.data.production;
+      state.productionCount = action.payload.data.count;
+      state.isLoading = false; 
+    }).addCase(getFiling.fulfilled, (state, action) => {
+      state.filing = action.payload.data.filing;
+      state.filingCount = action.payload.data.count;
+      state.isLoading = false; 
+    }).addCase(getDispatch.fulfilled, (state, action) => {
+      state.dispatch = action.payload.data.dispatch;
+      state.dispatchCount = action.payload.data.count;
+      state.isLoading = false; 
+    }).addCase(getDashboard.fulfilled, (state, action) => {
+      state.dashboardDetails = action.payload.data;
+      state.isLoading = false; 
+    })
     
-  },
+  },  
 
 });
 

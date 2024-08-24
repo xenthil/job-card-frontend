@@ -176,6 +176,8 @@ const MaterialInwards: React.FC = () => {
               data={data}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              editOption ={true}
+              deleteOption ={true}
             />
             <br></br>
             <div className="pagination">
