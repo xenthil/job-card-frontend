@@ -234,7 +234,7 @@ const ProductionProcess: React.FC = () => {
           <h6 className="fw-semibold mb-0">Assign Job</h6>
           <ul className="d-flex align-items-center gap-2">
             <Link
-              to="/production_details"
+              to="/filing_details"
               className="fw-medium btn btn-primary"
             >
               Back
@@ -515,7 +515,7 @@ const ProductionProcess: React.FC = () => {
                           <br></br>
                           <div style={{ textAlign: "center", padding: "5px" }}>
                             <Link
-                              to="/production_details"
+                              to="/filing_details"
                               className="fw-medium btn btn-primary"
                             >
                               Back
@@ -579,7 +579,7 @@ const ProductionProcess: React.FC = () => {
                           <br></br>
                           <div style={{ textAlign: "center", padding: "5px" }}>
                             <Link
-                              to="/production_details"
+                              to="/filing_details"
                               className="fw-medium btn btn-primary"
                             >
                               Back

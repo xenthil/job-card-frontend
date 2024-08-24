@@ -201,10 +201,10 @@ export const getMaterialInward = createAsyncThunk(
   )
 
   export const getDispatch = createAsyncThunk(
-    'materialInward/forwardFiling',
+    'materialInward/getDispatch',
     async (userData:any,{ rejectWithValue }) => {
       try{
-        let response = await api.post('/materialInward/forwardFiling',userData)
+        let response = await api.get('/materialInward/getDispatch')
         return response.data; 
       }catch(error:any){
         if (error.response) {

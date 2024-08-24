@@ -3,7 +3,7 @@ import Pagination from "../../components/Pagination";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  getFiling,
+  getDispatch,
 } from "../../redux/reducers/materialSlice";
 
 import { AppDispatch, RootState } from "../../redux/store";
@@ -66,7 +66,7 @@ const JobProduction: React.FC = () => {
   };
 
   const handleEdit = (row: any) => {
-    navigate("/filing", { state: {jobData:row} });
+    navigate("/dispatch", { state: {jobData:row} });
   };
 
  
@@ -97,7 +97,7 @@ const JobProduction: React.FC = () => {
 
   const getDispatchData = () => {
     let query = `page=${currentPage}&limit=${pageSize}`
-    dispatch(getFiling(query))
+    dispatch(getDispatch(query))
       .unwrap()
       .then((response: any) => {
         console.log("API response:", response);

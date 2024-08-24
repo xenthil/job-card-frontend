@@ -65,6 +65,8 @@ const Register:React.FC = ()=>{
               }
             })
             .catch((err:any) => {
+              setServerError(err?.data)
+              toast.error(err?.message);
                setIsLoading(false)
                dispatch(addMessage({'error':err}))
             });
