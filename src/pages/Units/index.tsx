@@ -3,67 +3,49 @@ import Pagination from "../../components/Pagination";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  getJobs,
-} from "../../redux/reducers/materialSlice";
+  getUnit,
+} from "../../redux/reducers/CommonSlice";
 import { AppDispatch, RootState } from "../../redux/store";
 import { toast } from "react-toastify";
-import PageLoader from "../../components/PageLoader";
 import DynamicTable from "../../components/DynamicTable";
 import { Column } from "react-table";
-import ModalComponent from "../../components/ModalComponent";
 
 
-const Jobs: React.FC = () => {
-  const data = useSelector((state: RootState) => state.clientMaterial.jobs);
-  const count = useSelector((state: RootState) => state.clientMaterial.jobsCount);
+interface TableColumn {
+  unit:string
+}
+
+const Unit: React.FC = () => {
+  const data = useSelector((state: RootState) => state.common.unit);
+  const count = useSelector((state: RootState) => state.common.unitCount);
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const columns: Column<any>[] = React.useMemo(
+  const columns: Column<TableColumn>[] = React.useMemo(
     () => [
       {
-        Header: "Client Name",
-        accessor: (row) => row.materialInward.client.clientName || "N/A",
-      },
-      {
-        Header: "Dc Number",
-        accessor: (row) => row.materialInward.dcNumber || "N/A",
-      },
-      {
-        Header: "Quantity",
-        accessor: "quantity",
-      },
-      {
-        Header: "Received Date",
-        accessor: (row) => {
-          const receivedDate = new Date(row.receivedDate);
-          return isNaN(receivedDate.getTime()) ? "N/A" : receivedDate.toISOString().slice(0, 10);
-        },
-      },
-      {
-        Header: "Estimated Dispatch Date",
-        accessor: (row) => {
-          const estimatedDispatchDate = new Date(row.estimatedDispatchDate);
-          return isNaN(estimatedDispatchDate.getTime()) ? "N/A" : estimatedDispatchDate.toISOString().slice(0, 10);
-        },
+        Header: "Name",
+        accessor: "unit",
       },
     ],
     []
   );
-  
+
   const handlePagination = (page: number) => {
     setCurrentPage(page);
   };
 
   const handleEdit = (row: any) => {
-    navigate("/assign-job", { state: {jobData:row} });
+    navigate("/editUnit", { state: row });
   };
 
+ 
+
   useEffect(() => {
-    getJobsData();
+    getData();
   }, [currentPage, pageSize]);
 
   useEffect(() => {
@@ -73,9 +55,9 @@ const Jobs: React.FC = () => {
     }
   }, [data, pageSize]);
 
-  const getJobsData = () => {
+  const getData = () => {
     let query = `page=${currentPage}&limit=${pageSize}`
-    dispatch(getJobs(query))
+    dispatch(getUnit(query))
       .unwrap()
       .then((response: any) => {
         console.log("API response:", response);
@@ -87,22 +69,28 @@ const Jobs: React.FC = () => {
       })
       .catch((err: any) => {
         console.error("API call error:", err);
-        
       });
   };
-
- 
 
   return (
     <>
       <div className="dashboard-main-body">
         <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
-          <h6 className="fw-semibold mb-0">Jobs</h6>
+          <h6 className="fw-semibold mb-0">Unit</h6>
+          <ul className="d-flex align-items-center gap-2">
+            <li className="fw-medium">
+              {" "}
+              <Link to="/addUnit" className="btn btn-primary">
+                {" "}
+                Add Unit
+              </Link>{" "}
+            </li>
+          </ul>
         </div>
 
         <div className="card basic-data-table">
           <div className="card-header">
-            <h5 className="card-title mb-0">Jobs informations</h5>
+            <h5 className="card-title mb-0">Unit informations</h5>
           </div>
           <div className="card-body">
             <DynamicTable
@@ -127,4 +115,4 @@ const Jobs: React.FC = () => {
   );
 };
 
-export default Jobs;
+export default Unit;

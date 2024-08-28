@@ -43,6 +43,7 @@ const ProductionProcess: React.FC = () => {
   const location = useLocation();
   const jobData = location?.state?.jobData;
   const editData = location?.state?.editData;
+  console.log('jobData',jobData)
  
   const initFormData = {
     completedQty: editData?.completedQty || "",
@@ -152,7 +153,7 @@ const ProductionProcess: React.FC = () => {
     try {
       await validationSchema.validate(formData, { abortEarly: false });
       setErrors({});
-      makeApiCall(toDispatch({ ...formData, materialFilingId:jobData.id , materialInwardId: jobData.materialInwardId }));
+      makeApiCall(toDispatch({ ...formData, materialFilingId:jobData.id , id: jobData.MaterialInwardDetailsId }));
       setFormData(initFormData)
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
@@ -177,7 +178,7 @@ const ProductionProcess: React.FC = () => {
     try {
       await validationForwardSchema.validate(forwardFormData, { abortEarly: false });
       setErrors({});
-      makeApiCall(forwardFiling({ ...forwardFormData,materialFilingId:jobData.id , materialInwardId: jobData.materialInwardId}));
+      makeApiCall(forwardFiling({ ...forwardFormData,materialFilingId:jobData.id , id: jobData.MaterialInwardDetailsId}));
       setForwardFormData(initForwardFormData)
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
@@ -216,11 +217,7 @@ const ProductionProcess: React.FC = () => {
       });
   };
 
-  const handleSelectInputChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    if (name == "assignedShift") getInchargeDetails(value);
-  };
+ 
 
   const handleTabClick = (tabId: any) => {
     setActiveTab(tabId);
@@ -255,53 +252,53 @@ const ProductionProcess: React.FC = () => {
                     <p>
                       <span className="job-lable"> Client name : </span>
                       <span className="job-value">
-                        {jobData.materialInward.client.clientName}
+                        {jobData.materialInwardDetails.materialInward.client.clientName}
                       </span>
                     </p>
                   </div>
                   <div className="col-md-4">
-                    <p>
+                    <p> 
                       <span className="job-lable"> Dc number :</span>
-                      <span className="job-value">
-                        {jobData.materialInward.dcNumber}
-                      </span>
+                      <span className="job-value"> {jobData.materialInwardDetails.materialInward.dcNumber} </span>
                     </p>
                   </div>
                   <div className="col-md-4">
                     <p>
                       <span className="job-lable"> Job type : </span>
-                      <span className="job-value">
-                        {jobData.materialInward.jobType.name}
-                      </span>
+                      <span className="job-value">{jobData.materialInwardDetails.jobType.name}</span>
                     </p>
                   </div>
                   <div className="col-md-4">
                     <p>
-                      <span className="job-lable">Received quantity :</span>
+                      <span className="job-lable"> Job ID : </span>
+                      <span className="job-value">{jobData.materialInwardDetails.jobId}</span>
+                    </p>
+                  </div>
+                  <div className="col-md-4">
+                    <p>
+                      <span className="job-lable"> Material : </span>
+                      <span className="job-value">{jobData.materialInwardDetails.material}</span>
+                    </p>
+                  </div>
+                  <div className="col-md-4">
+                    <p>
+                      <span className="job-lable"> Thickness : </span>
+                      <span className="job-value">{jobData.materialInwardDetails.thickness}</span>
+                    </p>
+                  </div>
+                 
+                  <div className="col-md-4">
+                    <p>
+                      <span className="job-lable"> Quantity :</span>
                       <span className="job-value"> {jobData.receivedQty} </span>
                     </p>
                   </div>
-                  <div className="col-md-4">
-                    <p>
-                      <span className="job-lable">Coating required :</span>
-                      <span className="job-value">
-                        {jobData.materialInward.coatingRequired}
-                      </span>
-                    </p>
-                  </div>
-                  <div className="col-md-4">
-                    <p>
-                      <span className="job-lable">No Of Materials :</span>
-                      <span className="job-value">
-                        {jobData.materialInward.noOfMaterials}
-                      </span>
-                    </p>
-                  </div>
+                 
                   <div className="col-md-4">
                     <p>
                       <span className="job-lable"> Received date :</span>
                       <span className="job-value">
-                        {new Date(jobData.materialInward.receivedDate)
+                        {new Date(jobData.materialInwardDetails.receivedDate)
                           .toISOString()
                           .slice(0, 10)}
                       </span>
@@ -310,10 +307,11 @@ const ProductionProcess: React.FC = () => {
                   <div className="col-md-4">
                     <p>
                       <span className="job-lable">
+
                         Estimated dispatch date :
                       </span>
                       <span className="job-value">
-                        {new Date(jobData.materialInward.estimatedDispatchDate)
+                        {new Date(jobData.materialInwardDetails.estimatedDispatchDate)
                           .toISOString()
                           .slice(0, 10)}
                       </span>
@@ -321,10 +319,9 @@ const ProductionProcess: React.FC = () => {
                   </div>
                   <div className="col-md-4">
                     <p>
+                      
                       <span className="job-lable"> Inspection :</span>
-                      <span className="job-value">
-                        {jobData.materialInward.inspection}
-                      </span>
+                      <span className="job-value"> {jobData.materialInwardDetails.inspection} </span>
                     </p>
                   </div>
                 </div>
@@ -347,7 +344,7 @@ const ProductionProcess: React.FC = () => {
                         }`}
                         onClick={() => handleTabClick("filing")}
                       >
-                        Filing
+                        Dispatch
                       </button>
                     </div>
 

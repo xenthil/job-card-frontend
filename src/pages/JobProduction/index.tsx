@@ -45,27 +45,27 @@ const JobProduction: React.FC = () => {
     () => [
       {
         Header: "Client Name",
-        accessor: (row) => row.materialInward.client.clientName || "N/A",
+        accessor: (row) => row.materialInwardDetails.materialInward.client.clientName || "N/A",
       },
       {
         Header: "Dc Number",
-        accessor: (row) => row.materialInward.dcNumber || "N/A",
+        accessor: (row) => row.materialInwardDetails.materialInward.dcNumber || "N/A",
       },
       {
         Header: "Quantity",
-        accessor: "receivedQty",
+        accessor: (row) => row.receivedQty || "N/A",
       },
       {
         Header: "Received Date",
         accessor: (row) => {
-          const receivedDate = new Date(row.materialInward.receivedDate);
+          const receivedDate = new Date(row.materialInwardDetails.receivedDate);
           return isNaN(receivedDate.getTime()) ? "N/A" : receivedDate.toISOString().slice(0, 10);
         },
       },
       {
         Header: "Estimated Dispatch Date",
         accessor: (row) => {
-          const estimatedDispatchDate = new Date(row.materialInward.estimatedDispatchDate);
+          const estimatedDispatchDate = new Date(row.materialInwardDetails.estimatedDispatchDate);
           return isNaN(estimatedDispatchDate.getTime()) ? "N/A" : estimatedDispatchDate.toISOString().slice(0, 10);
         },
       },

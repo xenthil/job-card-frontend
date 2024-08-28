@@ -8,6 +8,7 @@ import {
   getIncharge,
   getAllFloor,
   getAllShift,
+  getJobTypeMaterialList
 } from "../../redux/reducers/CommonSlice";
 import { toast } from "react-toastify";
 import AlertComponent from "../../components/AlertComponent";
@@ -24,15 +25,28 @@ interface IFormInput {
 
 const AssignJob: React.FC = () => {
   const inchargeList = useSelector((state: RootState) => state.common.inchargeList);
-
   const floorList = useSelector((state: RootState) => state.common.floorList);
-
   const shiftList = useSelector((state: RootState) => state.common.shiftList);
+  const jobTypeMaterialList = useSelector((state: RootState) => state.common.jobTypeMaterialList);
+
   const navigate = useNavigate();
   const dispatch: AppDispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState([]);
+  const [jobTypeMaterial, setJobTypeMaterial] = useState<any>([]);
 
+  useEffect(()=>{
+    let materialFields:any = [];
+    jobTypeMaterialList.forEach((material:any)=>{
+      let materialInfo:any = {}
+      materialInfo.displayName = material.displayName
+      materialInfo.name = material.id
+      materialInfo.qty = ""
+      materialFields.push(materialInfo)
+   })
+   setJobTypeMaterial(materialFields)
+  },[jobTypeMaterialList])
+  
   const location = useLocation();
   const jobData = location?.state?.jobData;
   const editData = location?.state?.editData;
@@ -105,9 +119,39 @@ const AssignJob: React.FC = () => {
       });
   };
 
+  const handleJobTypeMaterial = (e: React.ChangeEvent<HTMLInputElement>) =>{
+    const { name, value } = e.target;
+    let id = name.split('-')[1]
+    let data = jobTypeMaterial.map((material:any)=>{
+       if(material.name == id){
+         material.qty = value 
+       }
+       return material;
+    })  
+    setJobTypeMaterial(data)
+  }
+
+  const getJobTypeMaterial = () => {
+    let query = "id="+jobData.jobTypeId
+    dispatch(getJobTypeMaterialList(query))
+      .unwrap()
+      .then((response: any) => {
+        console.log("API response:", response);
+        if (response?.status === 200 || response?.status === 201) {
+          // toast.success(response?.message);
+        } else {
+          toast.error(response?.message);
+        }
+      })
+      .catch((err: any) => {
+        console.error("API call error:", err);
+      });
+  };
+
   useEffect(() => {
     getFloorDetails();
     getShiftDetails();
+    getJobTypeMaterial()
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -121,7 +165,7 @@ const AssignJob: React.FC = () => {
     try {
       await validationSchema.validate(formData, { abortEarly: false });
       setErrors({});
-      makeApiCall(assignJob({ ...formData, materialInwardId: jobData.id }));
+      makeApiCall(assignJob({ ...formData,jobTypeMaterial, id: jobData.id }));
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         const newErrors: any = {};
@@ -138,11 +182,9 @@ const AssignJob: React.FC = () => {
   };
 
   const makeApiCall = (functionName: any) => {
-    console.log("makeApical")
     dispatch(functionName)
       .unwrap()
       .then((response: any) => {
-        console.log("response",response)
         setIsLoading(false);
         if (response?.status === 200 || response?.status === 201) {
           toast.success(response?.message);
@@ -186,94 +228,82 @@ const AssignJob: React.FC = () => {
                 <div className="row">
                   <h6 className="job-header">
                     <u>Job details</u>
-                  </h6>{" "}
+                  </h6>
                   <br></br>
                   <div className="col-md-4">
                     <p>
-                      {" "}
-                      <span className="job-lable"> Client name : </span>{" "}
+                      <span className="job-lable"> Client name : </span>
                       <span className="job-value">
-                        {jobData.client.clientName}
-                      </span>{" "}
+                        {jobData.materialInward.client.clientName}
+                      </span>
+                    </p>
+                  </div>
+                  <div className="col-md-4">
+                    <p> 
+                      <span className="job-lable"> Dc number :</span>
+                      <span className="job-value"> {jobData.materialInward.dcNumber} </span>
                     </p>
                   </div>
                   <div className="col-md-4">
                     <p>
-                      {" "}
-                      <span className="job-lable"> Dc number :</span>{" "}
-                      <span className="job-value"> {jobData.dcNumber} </span>{" "}
+                      <span className="job-lable"> Job type : </span>
+                      <span className="job-value">{jobData.jobType.name}</span>
                     </p>
                   </div>
                   <div className="col-md-4">
                     <p>
-                      {" "}
-                      <span className="job-lable"> Job type : </span>{" "}
-                      <span className="job-value">{jobData.jobType.name}</span>{" "}
+                      <span className="job-lable"> Job ID : </span>
+                      <span className="job-value">{jobData.jobId}</span>
                     </p>
                   </div>
                   <div className="col-md-4">
                     <p>
-                      {" "}
-                      <span className="job-lable"> Quantity :</span>{" "}
-                      <span className="job-value"> {jobData.quantity} </span>{" "}
+                      <span className="job-lable"> Material : </span>
+                      <span className="job-value">{jobData.material}</span>
                     </p>
                   </div>
                   <div className="col-md-4">
                     <p>
-                      {" "}
-                      <span className="job-lable">
-                        {" "}
-                        Coating required :
-                      </span>{" "}
+                      <span className="job-lable"> Thickness : </span>
+                      <span className="job-value">{jobData.thickness}</span>
+                    </p>
+                  </div>
+                 
+                  <div className="col-md-4">
+                    <p>
+                      <span className="job-lable"> Quantity :</span>
+                      <span className="job-value"> {jobData.quantity} </span>
+                    </p>
+                  </div>
+                 
+                  <div className="col-md-4">
+                    <p>
+                      <span className="job-lable"> Received date :</span>
                       <span className="job-value">
-                        {" "}
-                        {jobData.coatingRequired}{" "}
-                      </span>{" "}
-                    </p>
-                  </div>
-                  <div className="col-md-4">
-                    <p>
-                      {" "}
-                      <span className="job-lable">
-                        {" "}
-                        No Of Materials :{" "}
-                      </span>{" "}
-                      <span className="job-value">
-                        {jobData.noOfMaterials}
-                      </span>{" "}
-                    </p>
-                  </div>
-                  <div className="col-md-4">
-                    <p>
-                      {" "}
-                      <span className="job-lable"> Received date :</span>{" "}
-                      <span className="job-value">
-                        {" "}
                         {new Date(jobData.receivedDate)
                           .toISOString()
-                          .slice(0, 10)}{" "}
-                      </span>{" "}
+                          .slice(0, 10)}
+                      </span>
                     </p>
                   </div>
                   <div className="col-md-4">
                     <p>
-                      {" "}
                       <span className="job-lable">
-                        {" "}
-                        Estimated dispatch date :{" "}
-                      </span>{" "}
+
+                        Estimated dispatch date :
+                      </span>
                       <span className="job-value">
                         {new Date(jobData.estimatedDispatchDate)
                           .toISOString()
-                          .slice(0, 10)}{" "}
-                      </span>{" "}
+                          .slice(0, 10)}
+                      </span>
                     </p>
                   </div>
                   <div className="col-md-4">
                     <p>
-                      {" "}
-                      <span className="job-lable"> Inspection :</span>{" "}
-                      <span className="job-value"> {jobData.inspection} </span>{" "}
+                      
+                      <span className="job-lable"> Inspection :</span>
+                      <span className="job-value"> {jobData.inspection} </span>
                     </p>
                   </div>
                 </div>
@@ -284,7 +314,29 @@ const AssignJob: React.FC = () => {
                     <AlertComponent serverError={serverError} />
                   )}
                 </div>
-
+                <br></br>
+                <hr></hr>
+                <div className="row">
+                  {jobTypeMaterial?.map((val:any)=>{
+                    return <>
+                        <div key={val.name} className="col-md-4">
+                            <div className="form-group">
+                            <label htmlFor={`materoal-${val.name}`}>{val.displayName} </label>
+                                <input
+                                    type="text" 
+                                    className="form-control"
+                                    name={`materoal-${val.name}`}
+                                    id={`materoal-${val.name}`}
+                                    value={val.qty}
+                                    onChange={handleJobTypeMaterial}
+                                  />
+                            </div>
+                        </div>
+                      </>
+                  })}
+                 
+                </div>
+                <br></br>
                 <form onSubmit={handleSubmit}>
                   <div className="row formStyle">
                     <hr></hr>
@@ -402,6 +454,8 @@ const AssignJob: React.FC = () => {
                       )}
                     </div>
                   </div>
+                  <br></br>
+                  <hr></hr>
                   <br></br>
                   <div style={{ textAlign: "center", padding: "5px" }}>
                     <Link to="/jobs" className="fw-medium btn btn-primary">

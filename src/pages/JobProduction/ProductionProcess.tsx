@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,18 +8,16 @@ import {
   getIncharge,
   getAllFloor,
   getAllShift,
+  getJobTypeMaterialList
 } from "../../redux/reducers/CommonSlice";
 import { toast } from "react-toastify";
 import AlertComponent from "../../components/AlertComponent";
 import PageLoader from "../../components/PageLoader";
 import "./production.css";
+import ReactToPrint from 'react-to-print';
 
 interface IFormInput {
   completedQty: string;
-  requiredCoating: string;
-  achivedCoating: string;
-  zincStartingLevel: string;
-  zincEndingLevel: string;
   date: string;
   remarks: string;
   assignedFloor: string;
@@ -41,8 +39,8 @@ const ProductionProcess: React.FC = () => {
   );
 
   const floorList = useSelector((state: RootState) => state.common.floorList);
-
   const shiftList = useSelector((state: RootState) => state.common.shiftList);
+  const jobTypeMaterialDataList = useSelector((state: RootState) => state.common.jobTypeMaterialList);
   const navigate = useNavigate();
   const dispatch: AppDispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
@@ -51,14 +49,11 @@ const ProductionProcess: React.FC = () => {
   const location = useLocation();
   const jobData = location?.state?.jobData;
   const editData = location?.state?.editData;
+  const componentRef:any = useRef();
   console.log('jobData',jobData)
 
   const initFormData = {
     completedQty: editData?.completedQty || "",
-    requiredCoating: editData?.requiredCoating || "",
-    achivedCoating: editData?.achivedCoating || "",
-    zincStartingLevel: editData?.zincStartingLevel || "",
-    zincEndingLevel: editData?.zincEndingLevel || "",
     remarks: editData?.remarks || "",
     date: editData?.date || "",
     assignedFloor: editData?.assignedFloor || "",
@@ -81,14 +76,11 @@ const ProductionProcess: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [forwrdFormerrors, setForwardFormErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [jobTypeMaterial, setJobTypeMaterial] = useState<any>([]);
 
   
   const validationSchema = Yup.object().shape({
     completedQty: Yup.string().required("Completed Qty is required"),
-    requiredCoating: Yup.string().required("Required coating is required"),
-    achivedCoating: Yup.string().required("Achived coating is required"),
-    zincStartingLevel: Yup.string().required("Zinc Starting Level is required"),
-    zincEndingLevel: Yup.string().required("Zinc Ending Level is required"),
     date: Yup.string().required("Date is required"),
     assignedFloor: Yup.string().required("Assigned floor is required"),
     assignedShift: Yup.string().required("Assigned shift is required"),
@@ -102,6 +94,18 @@ const ProductionProcess: React.FC = () => {
     assignedShift: Yup.string().required("Assigned shift is required"),
     shiftIncharge: Yup.string().required("Incharge is required"),
   });
+
+  useEffect(()=>{
+    let materialFields:any = [];
+    jobTypeMaterialDataList.forEach((material:any)=>{
+      let materialInfo:any = {}
+      materialInfo.displayName = material.displayName
+      materialInfo.name = material.id
+      materialInfo.qty = ""
+      materialFields.push(materialInfo)
+   })
+   setJobTypeMaterial(materialFields)
+  },[jobTypeMaterialDataList])
 
   const getInchargeDetails = (shift: string) => {
     let query = "shift=" + shift;
@@ -152,9 +156,27 @@ const ProductionProcess: React.FC = () => {
       });
   };
 
+  const getJobTypeMaterial = () => {
+    let query = "id="+jobData.id
+    dispatch(getJobTypeMaterialList(query))
+      .unwrap()
+      .then((response: any) => {
+        console.log("API response:", response);
+        if (response?.status === 200 || response?.status === 201) {
+          // toast.success(response?.message);
+        } else {
+          toast.error(response?.message);
+        }
+      })
+      .catch((err: any) => {
+        console.error("API call error:", err);
+      });
+  };
+
   useEffect(() => {
     getFloorDetails();
     getShiftDetails();
+    getJobTypeMaterial();
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -175,11 +197,9 @@ const ProductionProcess: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      console.log('doe')
       await validationSchema.validate(formData, { abortEarly: false });
-      console.log('vali')
       setErrors({});
-      makeApiCall(assignFiling({ ...formData, materialProductionId:jobData.id , materialInwardId: jobData.materialInwardId }));
+      makeApiCall(assignFiling({ ...formData,jobTypeMaterial,id:jobData.MaterialInwardDetailsId,materialProductionId : jobData.id  }));
       setFormData(initFormData)
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
@@ -253,6 +273,18 @@ const ProductionProcess: React.FC = () => {
     setActiveTab(tabId);
   };
 
+  const handleJobTypeMaterial = (e: React.ChangeEvent<HTMLInputElement>) =>{
+    const { name, value } = e.target;
+    let id = name.split('-')[1]
+    let data = jobTypeMaterial.map((material:any)=>{
+       if(material.name == id){
+         material.qty = value 
+       }
+       return material;
+    })  
+    setJobTypeMaterial(data)
+  }
+
   return (
     <>
       {isLoading && <PageLoader />}
@@ -273,7 +305,13 @@ const ProductionProcess: React.FC = () => {
           <div className="col-md-12">
             <div className="card">
               <div className="card-body">
-                <div className="row">
+               <div className="print">
+                <ReactToPrint
+                    trigger={() => <button className="btn btn-primary">Print</button>}
+                    content={() => componentRef.current}
+                  />
+               </div>
+                <div className="row" ref={componentRef}>
                   <h6 className="job-header">
                     <u>Job details</u>
                   </h6>
@@ -282,53 +320,53 @@ const ProductionProcess: React.FC = () => {
                     <p>
                       <span className="job-lable"> Client name : </span>
                       <span className="job-value">
-                        {jobData.materialInward.client.clientName}
+                        {jobData.materialInwardDetails.materialInward.client.clientName}
                       </span>
                     </p>
                   </div>
                   <div className="col-md-4">
-                    <p>
+                    <p> 
                       <span className="job-lable"> Dc number :</span>
-                      <span className="job-value">
-                        {jobData.materialInward.dcNumber}
-                      </span>
+                      <span className="job-value"> {jobData.materialInwardDetails.materialInward.dcNumber} </span>
                     </p>
                   </div>
                   <div className="col-md-4">
                     <p>
                       <span className="job-lable"> Job type : </span>
-                      <span className="job-value">
-                        {jobData.materialInward.jobType.name}
-                      </span>
+                      <span className="job-value">{jobData.materialInwardDetails.jobType.name}</span>
                     </p>
                   </div>
                   <div className="col-md-4">
                     <p>
-                      <span className="job-lable">Received quantity :</span>
+                      <span className="job-lable"> Job ID : </span>
+                      <span className="job-value">{jobData.materialInwardDetails.jobId}</span>
+                    </p>
+                  </div>
+                  <div className="col-md-4">
+                    <p>
+                      <span className="job-lable"> Material : </span>
+                      <span className="job-value">{jobData.materialInwardDetails.material}</span>
+                    </p>
+                  </div>
+                  <div className="col-md-4">
+                    <p>
+                      <span className="job-lable"> Thickness : </span>
+                      <span className="job-value">{jobData.materialInwardDetails.thickness}</span>
+                    </p>
+                  </div>
+                 
+                  <div className="col-md-4">
+                    <p>
+                      <span className="job-lable"> Quantity :</span>
                       <span className="job-value"> {jobData.receivedQty} </span>
                     </p>
                   </div>
-                  <div className="col-md-4">
-                    <p>
-                      <span className="job-lable">Coating required :</span>
-                      <span className="job-value">
-                        {jobData.materialInward.coatingRequired}
-                      </span>
-                    </p>
-                  </div>
-                  <div className="col-md-4">
-                    <p>
-                      <span className="job-lable">No Of Materials :</span>
-                      <span className="job-value">
-                        {jobData.materialInward.noOfMaterials}
-                      </span>
-                    </p>
-                  </div>
+                 
                   <div className="col-md-4">
                     <p>
                       <span className="job-lable"> Received date :</span>
                       <span className="job-value">
-                        {new Date(jobData.materialInward.receivedDate)
+                        {new Date(jobData.materialInwardDetails.receivedDate)
                           .toISOString()
                           .slice(0, 10)}
                       </span>
@@ -337,10 +375,11 @@ const ProductionProcess: React.FC = () => {
                   <div className="col-md-4">
                     <p>
                       <span className="job-lable">
+
                         Estimated dispatch date :
                       </span>
                       <span className="job-value">
-                        {new Date(jobData.materialInward.estimatedDispatchDate)
+                        {new Date(jobData.materialInwardDetails.estimatedDispatchDate)
                           .toISOString()
                           .slice(0, 10)}
                       </span>
@@ -348,10 +387,33 @@ const ProductionProcess: React.FC = () => {
                   </div>
                   <div className="col-md-4">
                     <p>
+                      
                       <span className="job-lable"> Inspection :</span>
-                      <span className="job-value">
-                        {jobData.materialInward.inspection}
-                      </span>
+                      <span className="job-value"> {jobData.materialInwardDetails.inspection} </span>
+                    </p>
+                  </div>
+                  <div className="col-md-4">
+                    <p>
+                      <span className="job-lable"> Date :</span>
+                      <span className="job-value"> {jobData.date} </span>
+                    </p>
+                  </div>
+                  <div className="col-md-4">
+                    <p>
+                      <span className="job-lable"> Floor :</span>
+                      <span className="job-value"> {jobData?.floor?.name} </span>
+                    </p>
+                  </div>
+                  <div className="col-md-4">
+                    <p>
+                      <span className="job-lable"> Shift :</span>
+                      <span className="job-value"> {jobData?.shift?.name} </span>
+                    </p>
+                  </div>
+                  <div className="col-md-4">
+                    <p>
+                      <span className="job-lable"> Incharge :</span>
+                      <span className="job-value"> {jobData.user.firstName} </span>
                     </p>
                   </div>
                 </div>
@@ -559,6 +621,31 @@ const ProductionProcess: React.FC = () => {
                       </div>
                     )}
                     {activeTab === "filing" && (
+                     <> 
+                     <br></br>
+                     <hr></hr>
+                     <div className="row">
+                      {jobTypeMaterial?.map((val:any)=>{
+                        return <>
+                            <div key={val.name} className="col-md-4">
+                                <div className="form-group">
+                                <label htmlFor={`materoal-${val.name}`}>{val.displayName} </label>
+                                    <input
+                                        type="text" 
+                                        className="form-control"
+                                        name={`materoal-${val.name}`}
+                                        id={`materoal-${val.name}`}
+                                        value={val.qty}
+                                        onChange={handleJobTypeMaterial}
+                                      />
+                                </div>
+                            </div>
+                          </>
+                      })}
+                     
+                    </div>
+                    <br></br>
+                    <hr></hr>
                       <div className="tab-pane  in active" id="tab2">
                         <form onSubmit={handleSubmit}>
                           <div className="row formStyle">
@@ -581,95 +668,6 @@ const ProductionProcess: React.FC = () => {
                               {errors.completedQty && (
                                 <p style={{ color: "red" }}>
                                   {errors.completedQty}
-                                </p>
-                              )}
-                            </div>
-
-                            <div className="col-md-6">
-                              <div className="form-group">
-                                <label htmlFor="requiredCoating">
-                                  Required Coating
-                                </label>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  name="requiredCoating"
-                                  id="requiredCoating"
-                                  value={formData.requiredCoating}
-                                  onChange={handleChange}
-                                  placeholder="Required Coating"
-                                />
-                              </div>
-                              {errors.requiredCoating && (
-                                <p style={{ color: "red" }}>
-                                  {errors.requiredCoating}
-                                </p>
-                              )}
-                            </div>
-
-                            <div className="col-md-6">
-                              <div className="form-group">
-                                <label htmlFor="achivedCoating">
-                                  {" "}
-                                  Achived Coating
-                                </label>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  name="achivedCoating"
-                                  id="achivedCoating"
-                                  value={formData.achivedCoating}
-                                  onChange={handleChange}
-                                  placeholder="Achived Coating"
-                                />
-                              </div>
-                              {errors.achivedCoating && (
-                                <p style={{ color: "red" }}>
-                                  {errors.achivedCoating}
-                                </p>
-                              )}
-                            </div>
-
-                            <div className="col-md-6">
-                              <div className="form-group">
-                                <label htmlFor="zincStartingLevel">
-                                  Zinc Starting Level
-                                </label>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  name="zincStartingLevel"
-                                  id="zincStartingLevel"
-                                  value={formData.zincStartingLevel}
-                                  onChange={handleChange}
-                                  placeholder="Zinc Starting Level"
-                                />
-                              </div>
-                              {errors.zincStartingLevel && (
-                                <p style={{ color: "red" }}>
-                                  {errors.zincStartingLevel}
-                                </p>
-                              )}
-                            </div>
-
-                            <div className="col-md-6">
-                              <div className="form-group">
-                                <label htmlFor="zincEndingLevel">
-                                  Zinc Ending Level
-                                </label>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  name="zincEndingLevel"
-                                  id="zincEndingLevel"
-                                  value={formData.zincEndingLevel}
-                                  onChange={handleChange}
-                                  placeholder="Zinc Ending Level"
-                                />
-                              </div>
-                              {errors.zincEndingLevel && (
-                                <p style={{ color: "red" }}>
-                                  {errors.zincEndingLevel}
                                 </p>
                               )}
                             </div>
@@ -826,6 +824,7 @@ const ProductionProcess: React.FC = () => {
                           </div>
                         </form>
                       </div>
+                      </>
                     )}
                   </div>
                 </div>

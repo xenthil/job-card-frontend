@@ -59,7 +59,15 @@ const Register:React.FC = ()=>{
               if(response?.status === 200){
                 toast.success(response?.message);
                 setServerError([])
-                navigate('/')
+                localStorage.setItem("token", response.token);
+                if(response.role == 1){
+                  navigate('/home')
+                }else if(response.role == 1){
+                  navigate('/material_inward')
+                }else{
+                  navigate('/production_details')
+                }
+                
               }else{
                 setServerError(response?.data)
               }

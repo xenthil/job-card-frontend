@@ -29,22 +29,23 @@ interface ClientFormInput {
 
 interface IFormInput {
   clientId: string;
-  quantity: number;
-  noOfMaterials: number;
   dcNumber: number;
   dcImage: any;
-  receivedDate: string;
-  estimatedDispatchDate: string;
-  isQtyApproved: string;
-  coatingRequired: string;
-  jobType: string;
-  inspection: string;
 }
 
 interface MaterialDetails {
   index: number;
   material: string;
   thickness: string;
+  quantity: string;
+  receivedDate: string;
+  estimatedDispatchDate: string;
+  jobTypeId: string;
+  inspection: string;
+  type: string;
+  length: string;
+  cleaning: string;
+  printing: string;
 }
 
 const AddAndEditMaterialInward: React.FC = () => {
@@ -61,40 +62,52 @@ const AddAndEditMaterialInward: React.FC = () => {
 
   const location = useLocation();
   const editData = location?.state;
-  console.log("editData", editData);
+
   const [formData, setFormData] = useState<IFormInput>({
     clientId: editData?.clientId || "",
-    quantity: editData?.quantity || "",
-    noOfMaterials: editData?.noOfMaterials || "",
     dcNumber: editData?.dcNumber || "",
     dcImage: "",
-    receivedDate: editData?.receivedDate
-      ? new Date(editData?.receivedDate).toISOString().slice(0, 10)
-      : "",
-    estimatedDispatchDate: editData?.estimatedDispatchDate
-      ? new Date(editData?.estimatedDispatchDate).toISOString().slice(0, 10)
-      : "",
-    isQtyApproved: editData?.isQtyApproved?.toString() || "",
-    jobType: editData?.jobType || "",
-    coatingRequired: editData?.coatingRequired || "",
-    inspection: editData?.inspection || "",
   });
 
   let initialMaterialDetails: MaterialDetails[] = [];
-  if (editData) {
-    if (editData?.materialInwardDetails?.length > 0) {
-      editData?.materialInwardDetails?.map((data: any, index: number) => {
-        let material: any = {};
-        material.index = index;
-        material.material = data.material;
-        material.thickness = data.thickness;
+  if (editData && editData?.materialInwardDetails?.length > 0) {
+    editData?.materialInwardDetails?.map((data: any, index: number) => {
+      let material: any = {};
+      material.index = index;
+      material.material = data.material;
+      material.thickness = data.thickness;
+      (material.quantity = data?.quantity || ""),
+        (material.receivedDate = data?.receivedDate
+          ? new Date(data?.receivedDate).toISOString().slice(0, 10)
+          : ""),
+        (material.estimatedDispatchDate = data?.estimatedDispatchDate
+          ? new Date(data?.estimatedDispatchDate).toISOString().slice(0, 10)
+          : ""),
+        (material.jobTypeId = data?.jobTypeId || ""),
+        (material.inspection = data?.inspection || ""),
+        (material.type = data?.type || ""),
+        (material.length = data?.length || ""),
+        (material.cleaning = data?.cleaning || ""),
+        (material.printing = data?.printing || ""),
         initialMaterialDetails.push(material);
-      });
-    } else {
-      initialMaterialDetails = [{ index: 1, material: "", thickness: "" }];
-    }
+    });
   } else {
-    initialMaterialDetails = [{ index: 1, material: "", thickness: "" }];
+    initialMaterialDetails = [
+      {
+        index: 1,
+        material: "",
+        thickness: "",
+        quantity: "",
+        receivedDate: "",
+        estimatedDispatchDate: "",
+        jobTypeId: "",
+        inspection: "",
+        type: "",
+        length: "",
+        cleaning: "",
+        printing: "",
+      },
+    ];
   }
 
   const [materialDetails, setMaterialDetails] = useState<MaterialDetails[]>(
@@ -117,17 +130,27 @@ const AddAndEditMaterialInward: React.FC = () => {
 
   const validationSchema = Yup.object().shape({
     clientId: Yup.string().required("Client name is required"),
-    quantity: Yup.string().required("Qunatity is required"),
-    noOfMaterials: Yup.string().required("No of materials is required"),
     dcNumber: Yup.string().required("DC Number is required"),
-    receivedDate: Yup.string().required("Received date is required"),
-    estimatedDispatchDate: Yup.string().required(
-      "Estimated Dispatch Date is required"
+  });
+
+  const validationMaterialDetailsSchema = Yup.object().shape({
+    items: Yup.array().of(
+      Yup.object().shape({
+        material: Yup.string().required("Material is required"),
+        thickness: Yup.string().required("Thickness is required"),
+        quantity: Yup.string().required("Quantity is required"),
+        receivedDate: Yup.string().required("Received Date is required"),
+        estimatedDispatchDate: Yup.string().required(
+          "Estimated Dispatch Date is required"
+        ),
+        jobTypeId: Yup.string().required("Job Type is required"),
+        inspection: Yup.string().required("Inspection is required"),
+        type: Yup.string().required("Type is required"),
+        length: Yup.string().required("Length is required"),
+        cleaning: Yup.string().required("Cleaning is required"),
+        printing: Yup.string().required("Printing is required"),
+      })
     ),
-    jobType: Yup.string().required("Job type  is required"),
-    coatingRequired: Yup.string().required("Coating required is required"),
-    inspection: Yup.string().required("inspection contact is required"),
-    isQtyApproved: Yup.string().required("Quantity check is required"),
   });
 
   const getJobTypeDetails = () => {
@@ -185,6 +208,7 @@ const AddAndEditMaterialInward: React.FC = () => {
     setIsSubmitting(true);
     try {
       await validationSchema.validate(formData, { abortEarly: false });
+      // await validationMaterialDetailsSchema.validate(materialDetails, { abortEarly: false })
       setErrors({});
       const formPayload = new FormData();
       Object.keys(formData).forEach((key) => {
@@ -209,6 +233,7 @@ const AddAndEditMaterialInward: React.FC = () => {
             newErrors[error.path] = error.message;
           }
         });
+        console.log('newErrors',newErrors)
         setErrors(newErrors);
       }
     } finally {
@@ -235,7 +260,9 @@ const AddAndEditMaterialInward: React.FC = () => {
       });
   };
 
-  const handleMaterialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMaterialChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     let nameAndId = name.split("-");
     let materialUpdate = materialDetails.map((material: any) => {
@@ -257,16 +284,23 @@ const AddAndEditMaterialInward: React.FC = () => {
     setClientFormData(clientAddress);
   };
 
-  const handleJobTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedOption = e.target.options[e.target.selectedIndex];
-    const jobType = selectedOption.value;
-    setFormData({ ...formData, jobType: jobType });
-  };
-
   const addMaterial = () => {
     let material = [
       ...materialDetails,
-      { index: materialDetails.length + 1, material: "", thickness: "" },
+      {
+        index: materialDetails.length + 1,
+        material: "",
+        thickness: "",
+        quantity: "",
+        receivedDate: "",
+        estimatedDispatchDate: "",
+        jobTypeId: "",
+        inspection: "",
+        type: "",
+        length: "",
+        cleaning: "",
+        printing: "",
+      },
     ];
     setMaterialDetails(material);
   };
@@ -498,42 +532,6 @@ const AddAndEditMaterialInward: React.FC = () => {
                     <hr></hr>
                     <div className="col-md-6">
                       <div className="form-group">
-                        <label htmlFor="quantity">Quantity (KG)</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          name="quantity"
-                          id="quantity"
-                          value={formData.quantity}
-                          onChange={handleChange}
-                          placeholder="Quantity"
-                        />
-                      </div>
-                      {errors.quantity && (
-                        <p style={{ color: "red" }}>{errors.quantity}</p>
-                      )}
-                    </div>
-
-                    <div className="col-md-6">
-                      <div className="form-group">
-                        <label htmlFor="noOfMaterials">No of materials</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          name="noOfMaterials"
-                          id="noOfMaterials"
-                          value={formData.noOfMaterials}
-                          onChange={handleChange}
-                          placeholder="No of materials"
-                        />
-                      </div>
-                      {errors.noOfMaterials && (
-                        <p style={{ color: "red" }}>{errors.noOfMaterials}</p>
-                      )}
-                    </div>
-
-                    <div className="col-md-6">
-                      <div className="form-group">
                         <label htmlFor="dcNumber">DC Number</label>
                         <input
                           type="text"
@@ -553,10 +551,11 @@ const AddAndEditMaterialInward: React.FC = () => {
                     <div className="col-md-6">
                       <div className="form-group">
                         <label htmlFor="dcImage">
-                          DC Image &#8203; 
+                          DC Image &#8203;
                           {editData?.dcImage ? (
                             <span>
-                              <a target="_blank"
+                              <a
+                                target="_blank"
                                 href={`${process.env.REACT_APP_BACKEND_FILE_URL}/materialInwards/1724748362096.pdf`}
                                 download
                               >
@@ -582,166 +581,6 @@ const AddAndEditMaterialInward: React.FC = () => {
                       )}
                     </div>
 
-                    <div className="col-md-6">
-                      <div className="form-group">
-                        <label htmlFor="receivedDate">Received Date</label>
-                        <input
-                          type="date"
-                          className="form-control"
-                          name="receivedDate"
-                          id="receivedDate"
-                          min={new Date().toISOString().split("T")[0]}
-                          value={formData.receivedDate}
-                          onChange={handleChange}
-                          placeholder="receivedDate"
-                        />
-                      </div>
-                      {errors.receivedDate && (
-                        <p style={{ color: "red" }}>{errors.receivedDate}</p>
-                      )}
-                    </div>
-
-                    <div className="col-md-6">
-                      <div className="form-group">
-                        <label htmlFor="estimatedDispatchDate">
-                          Estimated Dispatch Date
-                        </label>
-                        <input
-                          type="date"
-                          className="form-control"
-                          name="estimatedDispatchDate"
-                          id="estimatedDispatchDate"
-                          min={new Date().toISOString().split("T")[0]}
-                          value={formData.estimatedDispatchDate}
-                          onChange={handleChange}
-                          placeholder="Estimated Dispatch Date"
-                        />
-                      </div>
-                      {errors.estimatedDispatchDate && (
-                        <p style={{ color: "red" }}>
-                          {errors.estimatedDispatchDate}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="col-md-6">
-                      <div className="form-group">
-                        <label htmlFor="coatingRequired">
-                          Coating Required
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          name="coatingRequired"
-                          id="coatingRequired"
-                          value={formData.coatingRequired}
-                          onChange={handleChange}
-                          placeholder="Coating Required"
-                        />
-                      </div>
-                      {errors.coatingRequired && (
-                        <p style={{ color: "red" }}>{errors.coatingRequired}</p>
-                      )}
-                    </div>
-
-                    <div className="col-md-6">
-                      <div className="form-group">
-                        <label htmlFor="inspection">Inspection</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          name="inspection"
-                          id="inspection"
-                          value={formData.inspection}
-                          onChange={handleChange}
-                          placeholder="Inspection"
-                        />
-                      </div>
-                      {errors.inspection && (
-                        <p style={{ color: "red" }}>{errors.inspection}</p>
-                      )}
-                    </div>
-
-                    <div className="col-md-6">
-                      {/* <div className="form-group">
-                        <label htmlFor="isQtyApproved">Approved</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          name="isQtyApproved"
-                          id="isQtyApproved"
-                          value={formData.isQtyApproved}
-                          onChange={handleChange}
-                          placeholder="Approved"
-                        />
-                      </div> */}
-                      <br></br>
-                      <div className="form-check">
-                        <input
-                          className="form-check-input"
-                          value="1"
-                          onChange={handleChange}
-                          name="isQtyApproved"
-                          type="radio"
-                          checked={formData.isQtyApproved == "1"}
-                          id="isQtyApproved"
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="flexSwitchCheckDefault"
-                        >
-                          &#8203; All Quantity received
-                        </label>
-                      </div>
-                      <div className="form-check">
-                        <input
-                          className="form-check-input"
-                          value="0"
-                          onChange={handleChange}
-                          name="isQtyApproved"
-                          type="radio"
-                          checked={formData.isQtyApproved == "0"}
-                          id="isQtyApprovedPartial"
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="flexSwitchCheckDefault"
-                        >
-                          &#8203; Partially received
-                        </label>
-                      </div>
-                      {errors.isQtyApproved && (
-                        <p style={{ color: "red" }}>{errors.isQtyApproved}</p>
-                      )}
-                    </div>
-
-                    <div className="col-md-6">
-                      <div className="form-group">
-                        <label htmlFor="jobType">Job Type</label>
-                        <select
-                          className="form-control"
-                          name="jobType"
-                          id="jobType"
-                          value={formData.jobType}
-                          onChange={handleJobTypeChange}
-                        >
-                          {jobTypeList?.map((jobList: any) => {
-                            return (
-                              <>
-                                <option value={jobList.id}>
-                                  {jobList.name}
-                                </option>
-                              </>
-                            );
-                          })}
-                          <option value="">Please select </option>
-                        </select>
-                      </div>
-                      {errors.jobType && (
-                        <p style={{ color: "red" }}>{errors.jobType}</p>
-                      )}
-                    </div>
-
                     <hr></hr>
                     <span className="add-material" onClick={addMaterial}>
                       <iconify-icon icon="zondicons:add-solid"></iconify-icon>
@@ -749,7 +588,7 @@ const AddAndEditMaterialInward: React.FC = () => {
                     {materialDetails.map((data) => {
                       return (
                         <>
-                          <div className="col-md-5">
+                          <div className="col-md-3">
                             <div className="form-group">
                               <label htmlFor={`material-${data.index}`}>
                                 Material
@@ -764,10 +603,13 @@ const AddAndEditMaterialInward: React.FC = () => {
                                 placeholder="Material"
                               />
                             </div>
+                            {errors.material && (
+                              <p style={{ color: "red" }}>{errors.material}</p>
+                            )}
                           </div>
-                          <div className="col-md-5">
+                          <div className="col-md-3">
                             <div className="form-group">
-                              <label htmlFor={`material-${data.index}`}>
+                              <label htmlFor={`thickness-${data.index}`}>
                                 Thickness
                               </label>
                               <input
@@ -781,6 +623,179 @@ const AddAndEditMaterialInward: React.FC = () => {
                               />
                             </div>
                           </div>
+
+                          <div className="col-md-3">
+                            <div className="form-group">
+                              <label htmlFor={`quantity-${data.index}`}>
+                                Quantity (KG)
+                              </label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                name={`quantity-${data.index}`}
+                                id={`quantity-${data.index}`}
+                                value={data.quantity}
+                                onChange={handleMaterialChange}
+                                placeholder="Quantity"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="col-md-3">
+                            <div className="form-group">
+                              <label htmlFor={`type-${data.index}`}>
+                                Type{" "}
+                              </label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                name={`type-${data.index}`}
+                                id={`type-${data.index}`}
+                                value={data.type}
+                                onChange={handleMaterialChange}
+                                placeholder="Type"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="col-md-3">
+                            <div className="form-group">
+                              <label htmlFor={`length-${data.index}`}>
+                                Length{" "}
+                              </label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                name={`length-${data.index}`}
+                                id={`length-${data.index}`}
+                                value={data.length}
+                                onChange={handleMaterialChange}
+                                placeholder="Length"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="col-md-3">
+                            <div className="form-group">
+                              <label htmlFor={`jobTypeId-${data.index}`}>
+                                Job Type
+                              </label>
+                              <select
+                                className="form-control"
+                                name={`jobTypeId-${data.index}`}
+                                id={`jobTypeId-${data.index}`}
+                                value={data.jobTypeId}
+                                onChange={handleMaterialChange}
+                              >
+                                <option value="">Please select </option>
+                                {jobTypeList?.map((jobList: any) => {
+                                  return (
+                                    <>
+                                      <option value={jobList.id}>
+                                        {jobList.name}
+                                      </option>
+                                    </>
+                                  );
+                                })}
+                
+                              </select>
+                            </div>
+                          </div>
+
+                          <div className="col-md-3">
+                            <div className="form-group">
+                              <label htmlFor={`receivedDate-${data.index}`}>
+                                Received Date{" "}
+                              </label>
+                              <input
+                                type="date"
+                                className="form-control"
+                                name={`receivedDate-${data.index}`}
+                                id={`receivedDate-${data.index}`}
+                                value={data.receivedDate}
+                                onChange={handleMaterialChange}
+                                min={new Date().toISOString().split("T")[0]}
+                                placeholder="Received Date "
+                              />
+                            </div>
+                          </div>
+
+                          <div className="col-md-3">
+                            <div className="form-group">
+                              <label
+                                htmlFor={`estimatedDispatchDate-${data.index}`}
+                              >
+                                Estimated Date{" "}
+                              </label>
+                              <input
+                                type="date"
+                                className="form-control"
+                                name={`estimatedDispatchDate-${data.index}`}
+                                id={`estimatedDispatchDate-${data.index}`}
+                                value={data.estimatedDispatchDate}
+                                min={new Date().toISOString().split("T")[0]}
+                                onChange={handleMaterialChange}
+                                placeholder="Estimated Date"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="col-md-3">
+                            <div className="form-group">
+                              <label htmlFor={`inspection-${data.index}`}>
+                                Inspection{" "}
+                              </label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                name={`inspection-${data.index}`}
+                                id={`inspection-${data.index}`}
+                                value={data.inspection}
+                                onChange={handleMaterialChange}
+                                placeholder="Inspection "
+                              />
+                            </div>
+                          </div>
+                          <div className="col-md-3">
+                            <div className="form-group">
+                              <label htmlFor={`cleaning-${data.index}`}>
+                                Cleaning
+                              </label>
+                              <select
+                                className="form-control"
+                                name={`cleaning-${data.index}`}
+                                id={`cleaning-${data.index}`}
+                                value={data.cleaning}
+                                onChange={handleMaterialChange}
+                              >
+                                <option value="">Please select </option>
+                                <option value="1">Yes </option>
+                                <option value="3">No</option>
+                               
+                              </select>
+                            </div>
+                          </div>
+
+                          <div className="col-md-3">
+                            <div className="form-group">
+                              <label htmlFor={`printing-${data.index}`}>
+                                Printing
+                              </label>
+                              <select
+                                className="form-control"
+                                name={`printing-${data.index}`}
+                                id={`printing-${data.index}`}
+                                value={data.printing}
+                                onChange={handleMaterialChange}
+                              >
+                                <option value="">Please select </option>
+                                <option value="2">Yes </option>
+                                <option value="1">No</option>
+                               
+                              </select>
+                            </div>
+                          </div>
+                          
                           <div className="col-md-2">
                             <div className="form-group">
                               <span
@@ -792,6 +807,8 @@ const AddAndEditMaterialInward: React.FC = () => {
                               </span>
                             </div>
                           </div>
+                          <br></br>
+                          <hr></hr>
                         </>
                       );
                     })}

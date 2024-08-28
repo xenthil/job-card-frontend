@@ -3,24 +3,24 @@ import Pagination from "../../components/Pagination";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  getJobs,
+  getCleaning,
 } from "../../redux/reducers/materialSlice";
 import { AppDispatch, RootState } from "../../redux/store";
 import { toast } from "react-toastify";
-import PageLoader from "../../components/PageLoader";
 import DynamicTable from "../../components/DynamicTable";
 import { Column } from "react-table";
-import ModalComponent from "../../components/ModalComponent";
 
 
-const Jobs: React.FC = () => {
-  const data = useSelector((state: RootState) => state.clientMaterial.jobs);
-  const count = useSelector((state: RootState) => state.clientMaterial.jobsCount);
+const Cleaning: React.FC = () => {
+  const data = useSelector((state: RootState) => state.clientMaterial.cleaning);
+  const count = useSelector((state: RootState) => state.clientMaterial.cleaningCount);
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
+ 
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+ 
 
   const columns: Column<any>[] = React.useMemo(
     () => [
@@ -54,17 +54,21 @@ const Jobs: React.FC = () => {
     []
   );
   
+
   const handlePagination = (page: number) => {
     setCurrentPage(page);
   };
 
   const handleEdit = (row: any) => {
-    navigate("/assign-job", { state: {jobData:row} });
+    navigate("/updateCleaning", { state: {jobData:row} });
   };
 
+ 
+
   useEffect(() => {
-    getJobsData();
+    getCeaningData();
   }, [currentPage, pageSize]);
+
 
   useEffect(() => {
     if (data.length > 0) {
@@ -73,9 +77,9 @@ const Jobs: React.FC = () => {
     }
   }, [data, pageSize]);
 
-  const getJobsData = () => {
+  const getCeaningData = () => {
     let query = `page=${currentPage}&limit=${pageSize}`
-    dispatch(getJobs(query))
+    dispatch(getCleaning(query))
       .unwrap()
       .then((response: any) => {
         console.log("API response:", response);
@@ -87,24 +91,29 @@ const Jobs: React.FC = () => {
       })
       .catch((err: any) => {
         console.error("API call error:", err);
-        
       });
   };
 
- 
+  useEffect(() => {
+    getCeaningData();
+  }, []);
+
+
 
   return (
     <>
       <div className="dashboard-main-body">
         <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
-          <h6 className="fw-semibold mb-0">Jobs</h6>
+          <h6 className="fw-semibold mb-0">Cleaning</h6>
         </div>
 
         <div className="card basic-data-table">
           <div className="card-header">
-            <h5 className="card-title mb-0">Jobs informations</h5>
+            <h5 className="card-title mb-0">Cleaning informations</h5>
           </div>
           <div className="card-body">
+           
+            <br></br>
             <DynamicTable
               columns={columns}
               data={data}
@@ -127,4 +136,4 @@ const Jobs: React.FC = () => {
   );
 };
 
-export default Jobs;
+export default Cleaning;

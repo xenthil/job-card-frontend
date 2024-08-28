@@ -1,8 +1,11 @@
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
-import './sidebar.css'
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+import "./sidebar.css";
 
 const SideBar: React.FC = () => {
+  const user:any = useSelector((state: RootState) => state.auth.user);
   return (
     <>
       <aside className="sidebar">
@@ -30,9 +33,10 @@ const SideBar: React.FC = () => {
         </div>
         <div className="sidebar-menu-area">
           <ul className="sidebar-menu" id="sidebar-menu">
+            { user.role == 1 && <>
             <li className="">
               <NavLink
-                to="/"
+                to="/home"
                 className={({ isActive }) =>
                   `menu-link ${isActive ? "active" : ""}`
                 }
@@ -43,154 +47,213 @@ const SideBar: React.FC = () => {
                 ></iconify-icon>
                 <span>&nbsp;&nbsp;Dashboard</span>
               </NavLink>
-            </li>
-
+            </li> 
+            </>
+            }
+            { (user.role == 1 ||  user.role == 2) && <>
             <li>
-              <NavLink to="client" className={({ isActive }) =>
+              <NavLink
+                to="client"
+                className={({ isActive }) =>
                   `menu-link ${isActive ? "active" : ""}`
-                }>
+                }
+              >
                 <iconify-icon icon="mdi:user-outline"></iconify-icon>
                 &nbsp;&nbsp; Client
               </NavLink>
             </li>
             <li>
-              <NavLink to="material_inward" className={({ isActive }) =>
+              <NavLink
+                to="material_inward"
+                className={({ isActive }) =>
                   `menu-link ${isActive ? "active" : ""}`
-                }>
+                }
+              >
                 <iconify-icon icon="lets-icons:materials"></iconify-icon>
                 &nbsp;&nbsp;Material Inward
               </NavLink>
             </li>
             <li>
-              <NavLink to="jobs" className={({ isActive }) =>
+              <NavLink
+                to="cleaning"
+                className={({ isActive }) =>
                   `menu-link ${isActive ? "active" : ""}`
-                }>
+                }
+              >
+                <iconify-icon icon="material-symbols-light:cleaning-services-outline"></iconify-icon>
+                &nbsp;&nbsp; Cleaning
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="jobs"
+                className={({ isActive }) =>
+                  `menu-link ${isActive ? "active" : ""}`
+                }
+              >
                 <iconify-icon icon="hugeicons:new-job"></iconify-icon>
                 &nbsp;&nbsp;Jobs
               </NavLink>
             </li>
+            </>}
+            { (user.role == 1 ||  user.role == 3) && <>
             <li>
-              <NavLink to="production_details" className={({ isActive }) =>
+              <NavLink
+                to="production_details"
+                className={({ isActive }) =>
                   `menu-link ${isActive ? "active" : ""}`
-                }>
+                }
+              >
                 <iconify-icon icon="eos-icons:products"></iconify-icon>
                 &nbsp;&nbsp;Production Details
               </NavLink>
             </li>
             <li>
-              <NavLink to="filing_details" className={({ isActive }) =>
+              <NavLink
+                to="filing_details"
+                className={({ isActive }) =>
                   `menu-link ${isActive ? "active" : ""}`
-                }>
+                }
+              >
                 <iconify-icon icon="mdi:filing-cabinet"></iconify-icon>
                 &nbsp;&nbsp; Filing Details
               </NavLink>
             </li>
+            </> }
             <li>
-              <NavLink to="dispatch_details" className={({ isActive }) =>
+              <NavLink
+                to="dispatch_details"
+                className={({ isActive }) =>
                   `menu-link ${isActive ? "active" : ""}`
-                }>
+                }
+              >
                 <iconify-icon icon="iconamoon:delivery-fast-thin"></iconify-icon>
                 &nbsp;&nbsp;Dispatch Details
               </NavLink>
             </li>
-            <li>
-              <NavLink to="logout" className={({ isActive }) =>
-                  `menu-link ${isActive ? "active" : ""}`
-                }>
-                <iconify-icon icon="uiw:logout"></iconify-icon>
-                &nbsp;&nbsp; Logout
-              </NavLink>
-            </li>
-
-            {/* <li className="dropdown">
-              <Link to="">
-                <iconify-icon
-                  icon="flowbite:users-group-outline"
-                  className="menu-icon"
-                ></iconify-icon>
-                <span>Users</span>
-              </Link>
-              <ul className="sidebar-submenu">
-                <li>
-                  <a href="users-list.html">
-                    <i className="ri-circle-fill circle-icon text-primary-600 w-auto"></i>{" "}
-                    Users List
-                  </a>
-                </li>
-                <li>
-                  <a href="users-grid.html">
-                    <i className="ri-circle-fill circle-icon text-warning-main w-auto"></i>{" "}
-                    Users Grid
-                  </a>
-                </li>
-                <li>
-                  <a href="add-user.html">
-                    <i className="ri-circle-fill circle-icon text-info-main w-auto"></i>{" "}
-                    Add User
-                  </a>
-                </li>
-                <li>
-                  <a href="view-profile.html">
-                    <i className="ri-circle-fill circle-icon text-danger-main w-auto"></i>{" "}
-                    View Profile
-                  </a>
-                </li>
-              </ul>
-            </li>
-
+           { user.role == 1 && 
             <li className="dropdown">
-              <Link to="/">
+              <Link to="#">
                 <iconify-icon
                   icon="icon-park-outline:setting-two"
                   className="menu-icon"
                 ></iconify-icon>
-                <span>Settings</span>
+                <span> &nbsp;&nbsp; Settings</span>
               </Link>
               <ul className="sidebar-submenu">
                 <li>
-                  <a href="company.html">
-                    <i className="ri-circle-fill circle-icon text-primary-600 w-auto"></i>{" "}
-                    Company
-                  </a>
+                  <NavLink
+                    to="floor"
+                    className={({ isActive }) =>
+                      `menu-link ${isActive ? "active" : ""}`
+                    }
+                  >
+                    <iconify-icon icon="solar:floor-lamp-linear"></iconify-icon>
+                    &nbsp;&nbsp; Floor
+                  </NavLink>
                 </li>
                 <li>
-                  <a href="notification.html">
-                    <i className="ri-circle-fill circle-icon text-warning-main w-auto"></i>{" "}
-                    Notification
-                  </a>
+                  <NavLink
+                    to="shift"
+                    className={({ isActive }) =>
+                      `menu-link ${isActive ? "active" : ""}`
+                    }
+                  >
+                    <iconify-icon icon="fluent:shifts-16-regular"></iconify-icon>
+                    &nbsp;&nbsp; Shift
+                  </NavLink>
                 </li>
                 <li>
-                  <a href="notification-alert.html">
-                    <i className="ri-circle-fill circle-icon text-info-main w-auto"></i>{" "}
-                    Notification Alert
-                  </a>
+                  <NavLink
+                    to="role"
+                    className={({ isActive }) =>
+                      `menu-link ${isActive ? "active" : ""}`
+                    }
+                  >
+                    <iconify-icon icon="carbon:user-role"></iconify-icon>
+                    &nbsp;&nbsp; Role
+                  </NavLink>
                 </li>
                 <li>
-                  <a href="theme.html">
-                    <i className="ri-circle-fill circle-icon text-danger-main w-auto"></i>{" "}
-                    Theme
-                  </a>
+                  <NavLink
+                    to="user"
+                    className={({ isActive }) =>
+                      `menu-link ${isActive ? "active" : ""}`
+                    }
+                  >
+                    <iconify-icon icon="mdi:user-key"></iconify-icon>
+                    &nbsp;&nbsp; User
+                  </NavLink>
                 </li>
                 <li>
-                  <a href="currencies.html">
-                    <i className="ri-circle-fill circle-icon text-danger-main w-auto"></i>{" "}
-                    Currencies
-                  </a>
+                  <NavLink
+                    to="unit"
+                    className={({ isActive }) =>
+                      `menu-link ${isActive ? "active" : ""}`
+                    }
+                  >
+                    <iconify-icon icon="ph:unite-bold"></iconify-icon>
+                    &nbsp;&nbsp; Unit
+                  </NavLink>
                 </li>
                 <li>
-                  <a href="language.html">
-                    <i className="ri-circle-fill circle-icon text-danger-main w-auto"></i>{" "}
-                    Languages
-                  </a>
+                  <NavLink
+                    to="material"
+                    className={({ isActive }) =>
+                      `menu-link ${isActive ? "active" : ""}`
+                    }
+                  >
+                    <iconify-icon icon="icon-park:material-three"></iconify-icon>
+                    &nbsp;&nbsp; Material
+                  </NavLink>
                 </li>
                 <li>
-                  <a href="payment-gateway.html">
-                    <i className="ri-circle-fill circle-icon text-danger-main w-auto"></i>{" "}
-                    Payment Gateway
-                  </a>
+                  <NavLink
+                    to="jobtype"
+                    className={({ isActive }) =>
+                      `menu-link ${isActive ? "active" : ""}`
+                    }
+                  >
+                    <iconify-icon icon="carbon:batch-job"></iconify-icon>
+                    &nbsp;&nbsp; Job type
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="jobtype_material"
+                    className={({ isActive }) =>
+                      `menu-link ${isActive ? "active" : ""}`
+                    }
+                  >
+                    <iconify-icon icon="hugeicons:new-job"></iconify-icon>
+                    &nbsp;&nbsp; Job type Material
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="inventory"
+                    className={({ isActive }) =>
+                      `menu-link ${isActive ? "active" : ""}`
+                    }
+                  >
+                    <iconify-icon icon="ic:sharp-inventory"></iconify-icon>
+                    &nbsp;&nbsp; Inventory
+                  </NavLink>
                 </li>
               </ul>
-            </li> */}
+            </li>
+            }
+            <li>
+              <NavLink
+                to="logout"
+                className={({ isActive }) =>
+                  `menu-link ${isActive ? "active" : ""}`
+                }
+              >
+                <iconify-icon icon="uiw:logout"></iconify-icon>
+                &nbsp;&nbsp; Logout
+              </NavLink>
+            </li>
           </ul>
         </div>
       </aside>

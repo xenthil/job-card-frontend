@@ -232,6 +232,38 @@ export const getMaterialInward = createAsyncThunk(
     }
   )
 
+  export const getCleaning = createAsyncThunk(
+    'materialInward/getCleaning',
+    async (userData:any,{ rejectWithValue }) => {
+      try{
+        let response = await api.get('/materialInward/getCleaning')
+        return response.data; 
+      }catch(error:any){
+        if (error.response) {
+          return rejectWithValue(error.response.data);
+        } else {
+          return rejectWithValue({ message: 'Network error' });
+        }
+      }  
+    }
+  )
+
+  export const updateCeaning = createAsyncThunk(
+    'materialInward/updateCeaning',
+    async (userData:any,{ rejectWithValue }) => {
+      try{
+        let response = await api.put('/materialInward/updateCeaning',userData)
+        return response.data; 
+      }catch(error:any){
+        if (error.response) {
+          return rejectWithValue(error.response.data);
+        } else {
+          return rejectWithValue({ message: 'Network error' });
+        }
+      }  
+    }
+  )
+
   
 
 
@@ -244,12 +276,14 @@ const materialSlice = createSlice({
     production : [],
     filing : [],
     dispatch : [],
+    cleaning : [],
     dashboardDetails : {},
     count : 0,
     jobsCount : 0,
     productionCount : 0,
     filingCount : 0,
     dispatchCount : 0,
+    cleaningCount : 0,
     message : {}
   },
   reducers : {
@@ -287,6 +321,10 @@ const materialSlice = createSlice({
       state.isLoading = false; 
     }).addCase(getDashboard.fulfilled, (state, action) => {
       state.dashboardDetails = action.payload.data;
+      state.isLoading = false; 
+    }).addCase(getCleaning.fulfilled, (state, action) => {
+      state.cleaning = action.payload.data.cleaning;
+      state.cleaningCount = action.payload.data.count;
       state.isLoading = false; 
     })
     
