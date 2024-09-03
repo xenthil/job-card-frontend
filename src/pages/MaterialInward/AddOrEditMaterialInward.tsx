@@ -333,7 +333,7 @@ const AddAndEditMaterialInward: React.FC = () => {
                   <div className="row formStyle">
                     <div className="col-md-6">
                       <div className="form-group">
-                        <label htmlFor="clientId">Supplier Name</label>
+                        <label htmlFor="clientId">Customer Name</label>
                         <select
                           className="form-control"
                           name="clientId"
@@ -365,7 +365,7 @@ const AddAndEditMaterialInward: React.FC = () => {
                     </div>
                     <div className="col-md-6">
                       <div className="form-group">
-                        <label htmlFor="email">Supplier Email</label>
+                        <label htmlFor="email">Customer Email</label>
                         <input
                           type="text"
                           className="form-control"
@@ -383,7 +383,7 @@ const AddAndEditMaterialInward: React.FC = () => {
 
                     <div className="col-md-6">
                       <div className="form-group">
-                        <label htmlFor="contact">Supplier Contact</label>
+                        <label htmlFor="contact">Customer Contact</label>
                         <input
                           type="text"
                           className="form-control"
@@ -401,7 +401,7 @@ const AddAndEditMaterialInward: React.FC = () => {
 
                     <div className="col-md-6">
                       <div className="form-group">
-                        <label htmlFor="address">Supplier Address</label>
+                        <label htmlFor="address">Customer Address</label>
                         <input
                           type="text"
                           className="form-control"
@@ -419,7 +419,7 @@ const AddAndEditMaterialInward: React.FC = () => {
 
                     <div className="col-md-6">
                       <div className="form-group">
-                        <label htmlFor="area">Supplier Area</label>
+                        <label htmlFor="area">Customer Area</label>
                         <input
                           type="text"
                           className="form-control"
@@ -437,7 +437,7 @@ const AddAndEditMaterialInward: React.FC = () => {
 
                     <div className="col-md-6">
                       <div className="form-group">
-                        <label htmlFor="city">Supplier city</label>
+                        <label htmlFor="city">Customer city</label>
                         <input
                           type="text"
                           className="form-control"
@@ -644,7 +644,7 @@ const AddAndEditMaterialInward: React.FC = () => {
                           <div className="col-md-3">
                             <div className="form-group">
                               <label htmlFor={`type-${data.index}`}>
-                                Type{" "}
+                                Required coating thickness
                               </label>
                               <input
                                 type="text"
@@ -658,7 +658,7 @@ const AddAndEditMaterialInward: React.FC = () => {
                             </div>
                           </div>
 
-                          <div className="col-md-3">
+                          {/* <div className="col-md-3">
                             <div className="form-group">
                               <label htmlFor={`length-${data.index}`}>
                                 Length{" "}
@@ -673,12 +673,12 @@ const AddAndEditMaterialInward: React.FC = () => {
                                 placeholder="Length"
                               />
                             </div>
-                          </div>
+                          </div> */}
 
                           <div className="col-md-3">
                             <div className="form-group">
                               <label htmlFor={`jobTypeId-${data.index}`}>
-                                Job Type
+                                Process
                               </label>
                               <select
                                 className="form-control"
@@ -705,14 +705,14 @@ const AddAndEditMaterialInward: React.FC = () => {
                           <div className="col-md-3">
                             <div className="form-group">
                               <label htmlFor={`receivedDate-${data.index}`}>
-                                Received Date{" "}
+                                Received Date
                               </label>
                               <input
                                 type="date"
                                 className="form-control"
                                 name={`receivedDate-${data.index}`}
                                 id={`receivedDate-${data.index}`}
-                                value={data.receivedDate}
+                                value={data.receivedDate || new Date().toISOString().split("T")[0]}
                                 onChange={handleMaterialChange}
                                 min={new Date().toISOString().split("T")[0]}
                                 placeholder="Received Date "
@@ -743,23 +743,25 @@ const AddAndEditMaterialInward: React.FC = () => {
                           <div className="col-md-3">
                             <div className="form-group">
                               <label htmlFor={`inspection-${data.index}`}>
-                                Inspection{" "}
+                                Inspection
                               </label>
-                              <input
-                                type="text"
+                              <select
                                 className="form-control"
                                 name={`inspection-${data.index}`}
                                 id={`inspection-${data.index}`}
                                 value={data.inspection}
-                                onChange={handleMaterialChange}
-                                placeholder="Inspection "
-                              />
+                                onChange={handleMaterialChange} 
+                              >
+                                <option value="">Please select </option>
+                                <option value="Internal">Internal </option>
+                                <option value="Third Party">Third Party</option>
+                              </select>
                             </div>
                           </div>
                           <div className="col-md-3">
                             <div className="form-group">
                               <label htmlFor={`cleaning-${data.index}`}>
-                                Cleaning
+                                Received material condition
                               </label>
                               <select
                                 className="form-control"
@@ -779,7 +781,7 @@ const AddAndEditMaterialInward: React.FC = () => {
                           <div className="col-md-3">
                             <div className="form-group">
                               <label htmlFor={`printing-${data.index}`}>
-                                Printing
+                                Print
                               </label>
                               <select
                                 className="form-control"

@@ -50,7 +50,7 @@ const ProductionProcess: React.FC = () => {
   const jobData = location?.state?.jobData;
   const editData = location?.state?.editData;
   const componentRef:any = useRef();
-  console.log('jobData',jobData)
+ 
 
   const initFormData = {
     completedQty: editData?.completedQty || "",
@@ -102,6 +102,7 @@ const ProductionProcess: React.FC = () => {
       materialInfo.displayName = material.displayName
       materialInfo.name = material.id
       materialInfo.qty = ""
+      materialInfo.cqty = ""
       materialFields.push(materialInfo)
    })
    setJobTypeMaterial(materialFields)
@@ -275,10 +276,16 @@ const ProductionProcess: React.FC = () => {
 
   const handleJobTypeMaterial = (e: React.ChangeEvent<HTMLInputElement>) =>{
     const { name, value } = e.target;
-    let id = name.split('-')[1]
+    let inputField = name.split('-')
+    let id = inputField[1]
+    let field = inputField[0].split('_')
     let data = jobTypeMaterial.map((material:any)=>{
        if(material.name == id){
-         material.qty = value 
+         if(field[1] == 'starting'){
+           material.qty = value 
+         }else{
+          material.cqty = value 
+         }  
        }
        return material;
     })  
@@ -318,7 +325,7 @@ const ProductionProcess: React.FC = () => {
                   <br></br>
                   <div className="col-md-4">
                     <p>
-                      <span className="job-lable"> Client name : </span>
+                      <span className="job-lable"> Customer name : </span>
                       <span className="job-value">
                         {jobData.materialInwardDetails.materialInward.client.clientName}
                       </span>
@@ -627,15 +634,28 @@ const ProductionProcess: React.FC = () => {
                      <div className="row">
                       {jobTypeMaterial?.map((val:any)=>{
                         return <>
-                            <div key={val.name} className="col-md-4">
+                            <div key={val.name} className="col-md-6">
                                 <div className="form-group">
-                                <label htmlFor={`materoal-${val.name}`}>{val.displayName} </label>
+                                <label htmlFor={`materoal_starting-${val.name}`}>{val.displayName} (Starting Level) </label>
                                     <input
                                         type="text" 
                                         className="form-control"
-                                        name={`materoal-${val.name}`}
-                                        id={`materoal-${val.name}`}
+                                        name={`materoal_starting-${val.name}`}
+                                        id={`materoal_starting-${val.name}`}
                                         value={val.qty}
+                                        onChange={handleJobTypeMaterial}
+                                      />
+                                </div>
+                            </div>
+                            <div key={val.name} className="col-md-6">
+                                <div className="form-group">
+                                <label htmlFor={`materoal_ending-${val.name}`}>{val.displayName} (Ending Level) </label>
+                                    <input
+                                        type="text" 
+                                        className="form-control"
+                                        name={`materoal_ending-${val.name}`}
+                                        id={`materoal_ending-${val.name}`}
+                                        value={val.cqty}
                                         onChange={handleJobTypeMaterial}
                                       />
                                 </div>

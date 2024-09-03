@@ -54,7 +54,7 @@ const Client: React.FC = () => {
   const columns: Column<Clients>[] = React.useMemo(
     () => [
       {
-        Header: "Client Name",
+        Header: "Customer Name",
         accessor: "clientName",
       },
       {
@@ -153,13 +153,13 @@ const Client: React.FC = () => {
     <>
       <div className="dashboard-main-body">
         <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
-          <h6 className="fw-semibold mb-0">Client</h6>
+          <h6 className="fw-semibold mb-0">Customer</h6>
           <ul className="d-flex align-items-center gap-2">
             <li className="fw-medium">
               {" "}
               <Link to="/addClient" className="btn btn-primary">
                 {" "}
-                Add client
+                Add Customer
               </Link>{" "}
             </li>
           </ul>
@@ -167,7 +167,7 @@ const Client: React.FC = () => {
 
         <div className="card basic-data-table">
           <div className="card-header">
-            <h5 className="card-title mb-0">Client informations</h5>
+            <h5 className="card-title mb-0">Customer informations</h5>
           </div>
           <div className="card-body">
             <DynamicTable

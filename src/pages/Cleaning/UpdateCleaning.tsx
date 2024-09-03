@@ -77,7 +77,7 @@ const ProductionProcess: React.FC = () => {
                   <br></br>
                   <div className="col-md-4">
                     <p>
-                      <span className="job-lable"> Client name : </span>
+                      <span className="job-lable"> Customer name : </span>
                       <span className="job-value">
                         {jobData.materialInward.client.clientName}
                       </span>

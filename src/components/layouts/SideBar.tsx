@@ -59,7 +59,7 @@ const SideBar: React.FC = () => {
                 }
               >
                 <iconify-icon icon="mdi:user-outline"></iconify-icon>
-                &nbsp;&nbsp; Client
+                &nbsp;&nbsp; Customer
               </NavLink>
             </li>
             <li>
@@ -81,7 +81,7 @@ const SideBar: React.FC = () => {
                 }
               >
                 <iconify-icon icon="material-symbols-light:cleaning-services-outline"></iconify-icon>
-                &nbsp;&nbsp; Cleaning
+                &nbsp;&nbsp; Short blasting
               </NavLink>
             </li>
             <li>
@@ -92,7 +92,7 @@ const SideBar: React.FC = () => {
                 }
               >
                 <iconify-icon icon="hugeicons:new-job"></iconify-icon>
-                &nbsp;&nbsp;Jobs
+                &nbsp;&nbsp; Production planning
               </NavLink>
             </li>
             </>}
@@ -131,16 +131,8 @@ const SideBar: React.FC = () => {
                 &nbsp;&nbsp;Dispatch Details
               </NavLink>
             </li>
-           { user.role == 1 && 
-            <li className="dropdown">
-              <Link to="#">
-                <iconify-icon
-                  icon="icon-park-outline:setting-two"
-                  className="menu-icon"
-                ></iconify-icon>
-                <span> &nbsp;&nbsp; Settings</span>
-              </Link>
-              <ul className="sidebar-submenu">
+           { user.role == 1 &&  <>
+           
                 <li>
                   <NavLink
                     to="floor"
@@ -240,8 +232,9 @@ const SideBar: React.FC = () => {
                     &nbsp;&nbsp; Inventory
                   </NavLink>
                 </li>
-              </ul>
-            </li>
+              {/* </ul>
+            </li> */}
+            </>
             }
             <li>
               <NavLink

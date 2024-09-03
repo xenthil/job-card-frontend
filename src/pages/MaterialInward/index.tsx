@@ -42,7 +42,7 @@ const MaterialInwards: React.FC = () => {
   const columns: Column<MaterialInward>[] = React.useMemo(
     () => [
       {
-        Header: "Client Name",
+        Header: "Customer Name",
         accessor: (row) => row.client.clientName || "N/A",
       },
       {

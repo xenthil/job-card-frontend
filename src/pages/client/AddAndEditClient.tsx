@@ -145,7 +145,7 @@ const AddAndEditClient: React.FC = () => {
                 <div className="row formStyle">
                    <div className="col-md-6">
                       <div className="form-group">
-                          <label htmlFor="clientName">Supplier Name</label>
+                          <label htmlFor="clientName">Customer Name</label>
                           <input 
                              type="text" 
                              className="form-control" 
@@ -160,7 +160,7 @@ const AddAndEditClient: React.FC = () => {
                    </div>
                    <div className="col-md-6">
                       <div className="form-group">
-                          <label htmlFor="email">Supplier Email</label>
+                          <label htmlFor="email">Customer Email</label>
                           <input 
                             type="text" 
                             className="form-control" 
@@ -176,7 +176,7 @@ const AddAndEditClient: React.FC = () => {
                   
                    <div className="col-md-6">
                       <div className="form-group">
-                          <label htmlFor="contact">Supplier Contact</label>
+                          <label htmlFor="contact">Customer Contact</label>
                           <input type="text"
                              className="form-control"
                               name="contact" 
@@ -191,7 +191,7 @@ const AddAndEditClient: React.FC = () => {
 
                    <div className="col-md-6">
                       <div className="form-group">
-                          <label htmlFor="address">Supplier Address</label>
+                          <label htmlFor="address">Customer Address</label>
                           <input 
                              type="text" 
                              className="form-control" 
@@ -207,7 +207,7 @@ const AddAndEditClient: React.FC = () => {
 
                    <div className="col-md-6">
                       <div className="form-group">
-                          <label htmlFor="area">Supplier Area</label>
+                          <label htmlFor="area">Customer Area</label>
                           <input 
                              type="text" 
                              className="form-control" 
@@ -223,7 +223,7 @@ const AddAndEditClient: React.FC = () => {
 
                    <div className="col-md-6">
                       <div className="form-group">
-                          <label htmlFor="city">Supplier city</label>
+                          <label htmlFor="city">Customer city</label>
                           <input 
                              type="text"
                              className="form-control" 

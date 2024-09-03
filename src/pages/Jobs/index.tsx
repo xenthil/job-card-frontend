@@ -25,7 +25,7 @@ const Jobs: React.FC = () => {
   const columns: Column<any>[] = React.useMemo(
     () => [
       {
-        Header: "Client Name",
+        Header: "Customer Name",
         accessor: (row) => row.materialInward.client.clientName || "N/A",
       },
       {

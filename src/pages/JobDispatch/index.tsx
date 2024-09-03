@@ -31,28 +31,28 @@ const JobProduction: React.FC = () => {
   const columns: Column<any>[] = React.useMemo(
     () => [
       {
-        Header: "Client Name",
-        accessor: (row) => row.client.clientName || "N/A",
+        Header: "Customer Name",
+        accessor: (row) => row.materialInwardDetails.materialInward.client.clientName || "N/A",
       },
       {
         Header: "Dc Number",
-        accessor: "dcNumber",
+        accessor: (row) => row.materialInwardDetails.materialInward.dcNumber || "N/A",
       },
       {
         Header: "Quantity",
-        accessor: "quantity",
+        accessor: "receivedQty",
       },
       {
         Header: "Received Date",
         accessor: (row) => {
-          const receivedDate = new Date(row.receivedDate);
+          const receivedDate = new Date(row.materialInwardDetails.receivedDate);
           return isNaN(receivedDate.getTime()) ? "N/A" : receivedDate.toISOString().slice(0, 10);
         },
       },
       {
         Header: "Estimated Dispatch Date",
         accessor: (row) => {
-          const estimatedDispatchDate = new Date(row.estimatedDispatchDate);
+          const estimatedDispatchDate = new Date(row.materialInwardDetails.estimatedDispatchDate);
           return isNaN(estimatedDispatchDate.getTime()) ? "N/A" : estimatedDispatchDate.toISOString().slice(0, 10);
         },
       },
