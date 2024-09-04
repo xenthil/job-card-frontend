@@ -47,10 +47,11 @@ const ProductionProcess: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState([]);
+  const [materialError, setMaterialError] = useState<Record<string, string>>({});
   const [activeTab, setActiveTab] = useState("production");
   const location = useLocation();
   const jobData = location?.state?.jobData;
-  console.log('jobData',jobData)
+  
   const editData = location?.state?.editData;
   const componentRef: any = useRef();
 
@@ -98,6 +99,21 @@ const ProductionProcess: React.FC = () => {
     assignedShift: Yup.string().required("Assigned shift is required"),
     shiftIncharge: Yup.string().required("Incharge is required"),
   });
+
+  const validateMaterialError = (field:any) =>{
+     let error:any = {}
+     let status = true;
+     jobTypeMaterial?.forEach((val:any)=>{
+       if(!val[field]){
+         error[val.name] = "This field is required";
+       }
+     })
+     if(Object.keys(error).length > 0){
+      status = false
+     }
+     setMaterialError(error)
+     return status;
+  }
 
   useEffect(() => {
     let materialFields: any = [];
@@ -213,7 +229,11 @@ const ProductionProcess: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
+      let isValid = validateMaterialError('cqty');
       await validationSchema.validate(formData, { abortEarly: false });
+      if(!isValid){
+        return false;
+      }
       setErrors({});
       makeApiCall(
         assignFiling({
@@ -275,6 +295,10 @@ const ProductionProcess: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
+      let isValid = validateMaterialError('qty');
+      if(!isValid){
+         return false;
+      }
       makeApiCall(
         updateProduction({
           jobTypeMaterial,
@@ -770,6 +794,11 @@ const ProductionProcess: React.FC = () => {
                                         value={val.qty}
                                         onChange={handleJobTypeMaterial}
                                       />
+                                      {materialError[val.name] && (
+                                        <p style={{ color: "red" }}>
+                                          {materialError[val.name]}
+                                        </p>
+                                      )}
                                     </div>
                                   </div>
                                 </>
@@ -818,6 +847,11 @@ const ProductionProcess: React.FC = () => {
                                       value={val.cqty}
                                       onChange={handleJobTypeMaterial}
                                     />
+                                    {materialError[val.name] && (
+                                        <p style={{ color: "red" }}>
+                                          {materialError[val.name]}
+                                        </p>
+                                      )}
                                   </div>
                                 </div>
                               </>
