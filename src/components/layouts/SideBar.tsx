@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useState} from "react";
 import { Link, NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
@@ -6,6 +6,13 @@ import "./sidebar.css";
 
 const SideBar: React.FC = () => {
   const user:any = useSelector((state: RootState) => state.auth.user);
+
+  const [openMenu, setOpenMenu] = useState(null);
+
+  const handleMenuClick = (menuId:any) => {
+    setOpenMenu(openMenu === menuId ? null : menuId);
+  };
+
   return (
     <>
       <aside className="sidebar">
@@ -132,7 +139,16 @@ const SideBar: React.FC = () => {
               </NavLink>
             </li>
            { user.role == 1 &&  <>
-           
+            <li className={`dropdown ${openMenu === 'setting' ? 'dropdown-open' : ''}`}  onClick={() => handleMenuClick('setting')}
+            >
+            <a href="#">
+              <iconify-icon icon="icon-park-outline:setting-two" className="menu-icon"></iconify-icon>
+              <span>&nbsp;&nbsp;Settings</span> 
+             </a>
+             <ul
+                className="sidebar-submenu"
+                style={{ display: openMenu === 'setting' ? 'block' : 'none' }}
+              >
                 <li>
                   <NavLink
                     to="floor"
@@ -232,8 +248,8 @@ const SideBar: React.FC = () => {
                     &nbsp;&nbsp; Inventory
                   </NavLink>
                 </li>
-              {/* </ul>
-            </li> */}
+              </ul>
+            </li>
             </>
             }
             <li>

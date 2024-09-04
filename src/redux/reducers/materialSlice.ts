@@ -264,7 +264,21 @@ export const getMaterialInward = createAsyncThunk(
     }
   )
 
-  
+  export const updateDispatch = createAsyncThunk(
+    'materialInward/updateDispatch',
+    async (userData:any,{ rejectWithValue }) => {
+      try{
+        let response = await api.put('/materialInward/updateDispatch',userData)
+        return response.data; 
+      }catch(error:any){
+        if (error.response) {
+          return rejectWithValue(error.response.data);
+        } else {
+          return rejectWithValue({ message: 'Network error' });
+        }
+      }  
+    }
+  )
 
 
 const materialSlice = createSlice({

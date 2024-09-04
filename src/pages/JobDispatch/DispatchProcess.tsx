@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../redux/store";
 import AlertComponent from "../../components/AlertComponent";
 import { toast } from "react-toastify";
-import { assignJob } from "../../redux/reducers/materialSlice";
+import { updateDispatch } from "../../redux/reducers/materialSlice";
 import "./dispatch.css";
 
 interface IFormInput {
@@ -44,7 +44,7 @@ const ProductionProcess: React.FC = () => {
     try {
       await validationSchema.validate(formData, { abortEarly: false });
       setErrors({});
-      makeApiCall(assignJob({ ...formData, id: jobData.id }));
+      makeApiCall(updateDispatch({ ...formData, id: jobData.id }));
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         const newErrors: any = {};
@@ -184,6 +184,27 @@ const ProductionProcess: React.FC = () => {
                     <p>
                       <span className="job-lable"> Inspection :</span>
                       <span className="job-value"> {jobData.materialInwardDetails.inspection} </span>
+                    </p>
+                  </div>
+
+                  <div className="col-md-4">
+                    <p>
+                      <span className="job-lable"> Invoice no :</span>
+                      <span className="job-value"> {jobData.invoiceNo} </span>
+                    </p>
+                  </div>
+
+                  <div className="col-md-4">
+                    <p>
+                      <span className="job-lable"> Invoice Date :</span>
+                      <span className="job-value"> {jobData.invoiceDate} </span>
+                    </p>
+                  </div>
+
+                  <div className="col-md-4">
+                    <p>
+                      <span className="job-lable"> Invoice Amount :</span>
+                      <span className="job-value"> {jobData.invoiceAmount} </span>
                     </p>
                   </div>
 
