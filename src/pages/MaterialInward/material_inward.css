@@ -11,6 +11,12 @@
     color: green;
 }
 
+.submit-material{
+    margin-top: 30px;
+    font-size: 30px;
+    color: green;
+}
+
 .remove-material{
     padding: 5px;
     margin-top: 30px;

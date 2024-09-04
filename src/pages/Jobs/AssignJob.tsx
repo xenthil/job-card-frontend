@@ -213,7 +213,7 @@ const AssignJob: React.FC = () => {
       {isLoading && <PageLoader />}
       <div className="dashboard-main-body">
         <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
-          <h6 className="fw-semibold mb-0">Assign Job</h6>
+          <h6 className="fw-semibold mb-0">Production Planning</h6>
           <ul className="d-flex align-items-center gap-2">
             <Link to="/jobs" className="fw-medium btn btn-primary">
               Back

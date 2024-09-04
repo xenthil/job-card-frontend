@@ -48,19 +48,6 @@ interface MaterialDetails {
   printing: string;
 }
 
-interface CurrentMaterialDetails {
-  material: string;
-  thickness: string;
-  quantity: string;
-  receivedDate: string;
-  estimatedDispatchDate: string;
-  jobTypeId: string;
-  inspection: string;
-  type: string;
-  cleaning: string;
-  printing: string;
-}
-
 const AddAndEditMaterialInward: React.FC = () => {
   const ClientData = useSelector(
     (state: RootState) => state.client.allSupplier
@@ -105,30 +92,27 @@ const AddAndEditMaterialInward: React.FC = () => {
         initialMaterialDetails.push(material);
     });
   } else {
-    initialMaterialDetails = [];
+    initialMaterialDetails = [
+      {
+        index: 1,
+        material: "",
+        thickness: "",
+        quantity: "",
+        receivedDate: "",
+        estimatedDispatchDate: "",
+        jobTypeId: "",
+        inspection: "",
+        type: "",
+        length: "",
+        cleaning: "",
+        printing: "",
+      },
+    ];
   }
 
   const [materialDetails, setMaterialDetails] = useState<MaterialDetails[]>(
     initialMaterialDetails
   );
-
-  let initialCurrentMaterialDetails: CurrentMaterialDetails = {
-        material: "",
-        thickness: "",
-        quantity: "",
-        receivedDate: new Date().toISOString().split("T")[0],
-        estimatedDispatchDate: "",
-        jobTypeId: "",
-        inspection: "",
-        type: "",
-        cleaning: "",
-        printing: "2",
-  };
-  
-  const [currentMaterialDetails, setCurrentMaterialDetails] = useState<CurrentMaterialDetails>(
-    initialCurrentMaterialDetails
-  );
-
   const [clientFormData, setClientFormData] = useState<ClientFormInput>({
     email: "",
     contact: "",
@@ -142,27 +126,31 @@ const AddAndEditMaterialInward: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [materialErrors, setMaterialErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validationSchema = Yup.object().shape({
     clientId: Yup.string().required("Client name is required"),
     dcNumber: Yup.string().required("DC Number is required"),
   });
-  
-  const validationMaterialSchema = Yup.object().shape({
-    material: Yup.string().required("Material is required"),
-    thickness: Yup.string().required("Thickness is required"),
-    quantity: Yup.string().required("Quantity is required"),
-    receivedDate: Yup.string().required("Received Date is required"),
-    estimatedDispatchDate: Yup.string().required(
-      "Estimated Dispatch Date is required"
+
+  const validationMaterialDetailsSchema = Yup.object().shape({
+    items: Yup.array().of(
+      Yup.object().shape({
+        material: Yup.string().required("Material is required"),
+        thickness: Yup.string().required("Thickness is required"),
+        quantity: Yup.string().required("Quantity is required"),
+        receivedDate: Yup.string().required("Received Date is required"),
+        estimatedDispatchDate: Yup.string().required(
+          "Estimated Dispatch Date is required"
+        ),
+        jobTypeId: Yup.string().required("Job Type is required"),
+        inspection: Yup.string().required("Inspection is required"),
+        type: Yup.string().required("Type is required"),
+        length: Yup.string().required("Length is required"),
+        cleaning: Yup.string().required("Cleaning is required"),
+        printing: Yup.string().required("Printing is required"),
+      })
     ),
-    jobTypeId: Yup.string().required("Job Type is required"),
-    inspection: Yup.string().required("Inspection is required"),
-    type: Yup.string().required("Required coating thickness is required"),
-    cleaning: Yup.string().required("Received material condition is required"),
-    printing: Yup.string().required("Printing is required"),
   });
 
   const getJobTypeDetails = () => {
@@ -204,15 +192,6 @@ const AddAndEditMaterialInward: React.FC = () => {
     getSupplierData();
   }, []);
 
-  useEffect(()=>{
-    if(editData?.clientId && ClientData?.length > 0){
-      const client:any = ClientData.find((val:any)=>{
-         return val.id == editData?.clientId
-      })
-      setClientFormData(client?.address?.[0]);
-    }
-  },[])
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === "dcImage") {
@@ -229,10 +208,7 @@ const AddAndEditMaterialInward: React.FC = () => {
     setIsSubmitting(true);
     try {
       await validationSchema.validate(formData, { abortEarly: false });
-      if(materialDetails.length == 0){
-        toast.error("Please add material details");
-        return false;
-      }
+      // await validationMaterialDetailsSchema.validate(materialDetails, { abortEarly: false })
       setErrors({});
       const formPayload = new FormData();
       Object.keys(formData).forEach((key) => {
@@ -288,31 +264,15 @@ const AddAndEditMaterialInward: React.FC = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setCurrentMaterialDetails({ ...currentMaterialDetails, [name]: value });
-  };
-
-  const handleSubmitMaterial = async()=>{
-    try{
-      await validationMaterialSchema.validate(currentMaterialDetails, { abortEarly: false });
-      setMaterialErrors({})
-      const newMaterial:any = { ...currentMaterialDetails }
-      newMaterial.index = materialDetails.length
-      setMaterialDetails([...materialDetails,newMaterial])
-      setCurrentMaterialDetails(initialCurrentMaterialDetails)
-    }catch(err){
-      if (err instanceof Yup.ValidationError) {
-        const newErrors: any = {};
-        err.inner.forEach((error) => {
-          if (error.path) {
-            newErrors[error.path] = error.message;
-          }
-        });
-        console.log('newErrors',newErrors)
-        setMaterialErrors(newErrors);
+    let nameAndId = name.split("-");
+    let materialUpdate = materialDetails.map((material: any) => {
+      if (material.index == nameAndId[1]) {
+        return { ...material, [nameAndId[0]]: value };
       }
-    }
-     
-  }
+      return material;
+    });
+    setMaterialDetails(materialUpdate);
+  };
 
   const handleClientNameChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedOption = e.target.options[e.target.selectedIndex];
@@ -324,19 +284,30 @@ const AddAndEditMaterialInward: React.FC = () => {
     setClientFormData(clientAddress);
   };
 
-  
-  const removeMaterial = (id: number) => {
-    let material = materialDetails.filter((m: any,index:any) => index != id);
+  const addMaterial = () => {
+    let material = [
+      ...materialDetails,
+      {
+        index: materialDetails.length + 1,
+        material: "",
+        thickness: "",
+        quantity: "",
+        receivedDate: "",
+        estimatedDispatchDate: "",
+        jobTypeId: "",
+        inspection: "",
+        type: "",
+        length: "",
+        cleaning: "",
+        printing: "",
+      },
+    ];
     setMaterialDetails(material);
   };
-
-  const getJobName = (jobId:any):string =>{
-      const jobType:any = jobTypeList.find((val:any)=>{
-         return  val.id == jobId
-      })
-      let process = jobType?.name || ""
-      return process
-  }
+  const removeMaterial = (id: number) => {
+    let material = materialDetails.filter((m: any) => m.index != id);
+    setMaterialDetails(material);
+  };
 
   return (
     <>
@@ -612,96 +583,109 @@ const AddAndEditMaterialInward: React.FC = () => {
                     </div>
 
                     <hr></hr>
-                   
+                    <span className="add-material" onClick={addMaterial}>
+                      <iconify-icon icon="zondicons:add-solid"></iconify-icon>
+                    </span>
+                    {materialDetails.map((data) => {
+                      return (
+                        <>
                           <div className="col-md-3">
                             <div className="form-group">
-                              <label htmlFor={`material`}>
+                              <label htmlFor={`material-${data.index}`}>
                                 Material
                               </label>
                               <input
                                 type="text"
                                 className="form-control"
-                                name={`material`}
-                                id={`material`}
-                                value={currentMaterialDetails.material}
+                                name={`material-${data.index}`}
+                                id={`material-${data.index}`}
+                                value={data.material}
                                 onChange={handleMaterialChange}
                                 placeholder="Material"
                               />
-                               {materialErrors.material && (
-                                 <p style={{ color: "red" }}>{materialErrors.material}</p>
-                               )}
                             </div>
+                            {errors.material && (
+                              <p style={{ color: "red" }}>{errors.material}</p>
+                            )}
                           </div>
                           <div className="col-md-3">
                             <div className="form-group">
-                              <label htmlFor={`thickness`}>
+                              <label htmlFor={`thickness-${data.index}`}>
                                 Thickness
                               </label>
                               <input
                                 type="text"
                                 className="form-control"
-                                name={`thickness`}
-                                id={`thickness`}
-                                value={currentMaterialDetails.thickness}
+                                name={`thickness-${data.index}`}
+                                id={`thickness-${data.index}`}
+                                value={data.thickness}
                                 onChange={handleMaterialChange}
                                 placeholder="Thickness"
                               />
-                              {materialErrors.thickness && (
-                                 <p style={{ color: "red" }}>{materialErrors.thickness}</p>
-                               )}
                             </div>
                           </div>
 
                           <div className="col-md-3">
                             <div className="form-group">
-                              <label htmlFor={`quantity`}>
+                              <label htmlFor={`quantity-${data.index}`}>
                                 Quantity (KG)
                               </label>
                               <input
                                 type="text"
                                 className="form-control"
-                                name={`quantity`}
-                                id={`quantity`}
-                                value={currentMaterialDetails.quantity}
+                                name={`quantity-${data.index}`}
+                                id={`quantity-${data.index}`}
+                                value={data.quantity}
                                 onChange={handleMaterialChange}
                                 placeholder="Quantity"
                               />
-                              {materialErrors.quantity && (
-                                 <p style={{ color: "red" }}>{materialErrors.quantity}</p>
-                               )}
                             </div>
                           </div>
 
                           <div className="col-md-3">
                             <div className="form-group">
-                              <label htmlFor={`type`}>
+                              <label htmlFor={`type-${data.index}`}>
                                 Required coating thickness
                               </label>
                               <input
                                 type="text"
                                 className="form-control"
-                                name={`type`}
-                                id={`type`}
-                                value={currentMaterialDetails.type}
+                                name={`type-${data.index}`}
+                                id={`type-${data.index}`}
+                                value={data.type}
                                 onChange={handleMaterialChange}
                                 placeholder="Required coating thickness"
                               />
-                              {materialErrors.type && (
-                                 <p style={{ color: "red" }}>{materialErrors.type}</p>
-                               )}
                             </div>
                           </div>
 
+                          {/* <div className="col-md-3">
+                            <div className="form-group">
+                              <label htmlFor={`length-${data.index}`}>
+                                Length{" "}
+                              </label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                name={`length-${data.index}`}
+                                id={`length-${data.index}`}
+                                value={data.length}
+                                onChange={handleMaterialChange}
+                                placeholder="Length"
+                              />
+                            </div>
+                          </div> */}
+
                           <div className="col-md-3">
                             <div className="form-group">
-                              <label htmlFor={`jobTypeId`}>
+                              <label htmlFor={`jobTypeId-${data.index}`}>
                                 Process
                               </label>
                               <select
                                 className="form-control"
-                                name={`jobTypeId`}
-                                id={`jobTypeId`}
-                                value={currentMaterialDetails.jobTypeId}
+                                name={`jobTypeId-${data.index}`}
+                                id={`jobTypeId-${data.index}`}
+                                value={data.jobTypeId}
                                 onChange={handleMaterialChange}
                               >
                                 <option value="">Please select </option>
@@ -716,87 +700,75 @@ const AddAndEditMaterialInward: React.FC = () => {
                                 })}
                 
                               </select>
-                              {materialErrors.jobTypeId && (
-                                 <p style={{ color: "red" }}>{materialErrors.jobTypeId}</p>
-                               )}
                             </div>
                           </div>
 
                           <div className="col-md-3">
                             <div className="form-group">
-                              <label htmlFor={`receivedDate`}>
+                              <label htmlFor={`receivedDate-${data.index}`}>
                                 Received Date
                               </label>
                               <input
                                 type="date"
                                 className="form-control"
-                                name={`receivedDate`}
-                                id={`receivedDate`}
-                                value={currentMaterialDetails.receivedDate || new Date().toISOString().split("T")[0]}
+                                name={`receivedDate-${data.index}`}
+                                id={`receivedDate-${data.index}`}
+                                value={data.receivedDate || new Date().toISOString().split("T")[0]}
                                 onChange={handleMaterialChange}
                                 min={new Date().toISOString().split("T")[0]}
                                 placeholder="Received Date "
                               />
-                              {materialErrors.receivedDate && (
-                                 <p style={{ color: "red" }}>{materialErrors.receivedDate}</p>
-                               )}
                             </div>
                           </div>
 
                           <div className="col-md-3">
                             <div className="form-group">
                               <label
-                                htmlFor={`estimatedDispatchDate`}
+                                htmlFor={`estimatedDispatchDate-${data.index}`}
                               >
-                                Estimated Date
+                                Estimated Date{" "}
                               </label>
                               <input
                                 type="date"
                                 className="form-control"
-                                name={`estimatedDispatchDate`}
-                                id={`estimatedDispatchDate`}
-                                value={currentMaterialDetails.estimatedDispatchDate}
+                                name={`estimatedDispatchDate-${data.index}`}
+                                id={`estimatedDispatchDate-${data.index}`}
+                                value={data.estimatedDispatchDate}
                                 min={new Date().toISOString().split("T")[0]}
                                 onChange={handleMaterialChange}
                                 placeholder="Estimated Date"
                               />
-                              {materialErrors.estimatedDispatchDate && (
-                                 <p style={{ color: "red" }}>{materialErrors.estimatedDispatchDate}</p>
-                               )}
                             </div>
                           </div>
 
                           <div className="col-md-3">
                             <div className="form-group">
-                              <label htmlFor={`inspection`}>
+                              <label htmlFor={`inspection-${data.index}`}>
                                 Inspection
                               </label>
                               <select
                                 className="form-control"
-                                name={`inspection`}
-                                id={`inspection`}
-                                value={currentMaterialDetails.inspection}
+                                name={`inspection-${data.index}`}
+                                id={`inspection-${data.index}`}
+                                value={data.inspection}
                                 onChange={handleMaterialChange} 
                               >
                                 <option value="">Please select </option>
                                 <option value="Internal">Internal </option>
                                 <option value="Third Party">Third Party</option>
                               </select>
-                              {materialErrors.inspection && (
-                                 <p style={{ color: "red" }}>{materialErrors.inspection}</p>
-                               )}
                             </div>
                           </div>
                           <div className="col-md-3">
                             <div className="form-group">
-                              <label htmlFor={`cleaning`}>
+                              <label htmlFor={`cleaning-${data.index}`}>
                                 Received material condition
                               </label>
                               <select
                                 className="form-control"
-                                name={`cleaning`}
-                                id={`cleaning`}
-                                value={currentMaterialDetails.cleaning}
+                                name={`cleaning-${data.index}`}
+                                id={`cleaning-${data.index}`}
+                                value={data.cleaning}
                                 onChange={handleMaterialChange}
                               >
                                 <option value="">Please select </option>
@@ -804,115 +776,45 @@ const AddAndEditMaterialInward: React.FC = () => {
                                 <option value="3">No</option>
                                
                               </select>
-                              {materialErrors.cleaning && (
-                                 <p style={{ color: "red" }}>{materialErrors.cleaning}</p>
-                               )}
                             </div>
                           </div>
 
                           <div className="col-md-3">
                             <div className="form-group">
-                              <label htmlFor={`printing`}>
+                              <label htmlFor={`printing-${data.index}`}>
                                 Print
                               </label>
                               <select
                                 className="form-control"
-                                name={`printing`}
-                                id={`printing`}
-                                value={currentMaterialDetails.printing}
+                                name={`printing-${data.index}`}
+                                id={`printing-${data.index}`}
+                                value={data.printing}
                                 onChange={handleMaterialChange}
                               >
-                                <option value="">Please select </option>
+                                {/* <option value="">Please select </option> */}
                                 <option value="2">Yes </option>
                                 <option value="1">No</option>
                                
                               </select>
-                              {materialErrors.printing && (
-                                 <p style={{ color: "red" }}>{materialErrors.printing}</p>
-                               )}
                             </div>
                           </div>
                           
                           <div className="col-md-2">
                             <div className="form-group">
-                              {/* <span
+                              <span
                                 className="remove-material"
                                 id={`remove-${data.index}`}
                                 onClick={() => removeMaterial(data.index)}
-                              > */}
-                                {/* <iconify-icon icon="clarity:remove-solid"></iconify-icon> */}
-                                <span className="submit-material" onClick={handleSubmitMaterial}>
-                                  <iconify-icon icon="zondicons:add-solid"></iconify-icon>
-                                </span>
-                              {/* </span> */}
+                              >
+                                <iconify-icon icon="clarity:remove-solid"></iconify-icon>
+                              </span>
                             </div>
                           </div>
                           <br></br>
                           <hr></hr>
-
-                        { materialDetails.length > 0 && <div className="col-lg-12">
-                            <div className="card">
-                              <div className="card-header">
-                                <h5 className="card-title mb-0">Material List</h5>
-                              </div>
-                              <div className="card-body">
-                                <div className="table-responsive">
-                                  <table className="table border-primary-table mb-0">
-                                    <thead>
-                                      <tr>
-                                        <th scope="col">
-                                          <div className="form-check style-check d-flex align-items-center">
-                                            <label className="form-check-label">
-                                              S.L
-                                            </label>
-                                          </div>
-                                        </th>
-                                        <th scope="col">Material</th>
-                                        <th scope="col">Thickness</th>
-                                        <th scope="col">Quantity</th>
-                                        <th scope="col">Received Date</th>
-                                        <th scope="col">Estimated Date</th>
-                                        <th scope="col">Process</th>
-                                        <th scope="col">Inspection</th>
-                                        <th scope="col">Required coating thickness</th>
-                                        <th scope="col">Received material condition</th>
-                                        <th scope="col">Print</th>
-                                        <th scope="col">Action</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                     {materialDetails?.map((value:any,index:number)=>{
-                                        return <>
-                                                <tr>
-                                                  <td>{index+1}</td>
-                                                  <td>{value.material}</td>
-                                                  <td>{value.thickness}</td>
-                                                  <td>{value.quantity}</td>
-                                                  <td>{value.receivedDate}</td>
-                                                  <td>{value.estimatedDispatchDate}</td>
-                                                  <td>{getJobName(value.jobTypeId)}</td>
-                                                  <td>{value.inspection}</td>
-                                                  <td>{value.type}</td>
-                                                  <td>{value.cleaning == "1" ? 'Yes' : 'No'}</td>
-                                                  <td>{value.printing == "2" ? 'Yes' : 'No'}</td>
-                                                  <td> 
-                                                    <span onClick={() => removeMaterial(index)} >
-                                                      <iconify-icon icon="clarity:remove-solid"></iconify-icon>
-                                                    </span> 
-                                                  </td>
-                                                </tr>
-                                            </>
-                                        })
-                                      }
-                                    </tbody>
-                                  </table>
-                                </div>
-                              </div>
-                            </div>
-                          </div> }
-
-                  <hr></hr>
-                       
+                        </>
+                      );
+                    })}
                   </div>
                   <br></br>
                   <div style={{ textAlign: "center", padding: "5px" }}>

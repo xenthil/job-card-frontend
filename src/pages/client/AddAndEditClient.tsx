@@ -20,6 +20,10 @@ interface IFormInput {
     contactPersonName: string;
     contactPersonContact: string;
     description: string;
+    bankAccount: string;
+    bankBranch: string;
+    ifsc: string;
+    namePerBank: string;
 }
 
 
@@ -43,7 +47,11 @@ const AddAndEditClient: React.FC = () => {
         city: editData?.address?.[0]?.city || "",
         contactPersonName: editData?.address?.[0]?.contactPersonName || "",
         contactPersonContact: editData?.address?.[0]?.contactPersonContact || "",
-        description: editData?.address?.[0]?.description || ""
+        description: editData?.address?.[0]?.description || "",
+        bankAccount: editData?.bankAccount || "",
+        bankBranch: editData?.bankBranch || "",
+        ifsc: editData?.ifsc || "",
+        namePerBank: editData?.namePerBank || "",
       }
   );
 
@@ -71,7 +79,15 @@ const AddAndEditClient: React.FC = () => {
         .required('Contact person name is required'),
       contactPersonContact: Yup.string()
         .required('Contact person contact is required')
-        .min(10, 'Contact person contact must be at least 10 characters long')
+        .min(10, 'Contact person contact must be at least 10 characters long'),
+      bankAccount: Yup.string()
+        .required('Account no  is required'),
+      bankBranch: Yup.string()
+        .required('Branch  is required'),
+      ifsc: Yup.string()
+        .required('IFSC  is required'),
+      namePerBank: Yup.string()
+        .required('Name  is required'),
       });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -130,7 +146,7 @@ const AddAndEditClient: React.FC = () => {
      { isLoading && <PageLoader/>}
       <div className="dashboard-main-body">
         <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
-          <h6 className="fw-semibold mb-0">Client</h6>
+          <h6 className="fw-semibold mb-0">Customer</h6>
           <ul className="d-flex align-items-center gap-2">
              <Link to='/client' className="fw-medium btn btn-primary">Back</Link>
           </ul>
@@ -153,39 +169,9 @@ const AddAndEditClient: React.FC = () => {
                              id="clientName" 
                              value={formData.clientName}
                              onChange={handleChange} 
-                             placeholder="Supplier Name" 
+                             placeholder="Customer Name" 
                              />
                              {errors.clientName && <p style={{ color: 'red' }}>{errors.clientName}</p>}
-                      </div>
-                   </div>
-                   <div className="col-md-6">
-                      <div className="form-group">
-                          <label htmlFor="email">Customer Email</label>
-                          <input 
-                            type="text" 
-                            className="form-control" 
-                            name="email" 
-                            id="email" 
-                            value={formData.email}
-                            onChange={handleChange} 
-                            placeholder="Supplier email" 
-                            />
-                            {errors.email && <p style={{ color: 'red' }}>{errors.email}</p>}
-                      </div>
-                   </div>
-                  
-                   <div className="col-md-6">
-                      <div className="form-group">
-                          <label htmlFor="contact">Customer Contact</label>
-                          <input type="text"
-                             className="form-control"
-                              name="contact" 
-                              id="contact"
-                              value={formData.contact}
-                              onChange={handleChange} 
-                              placeholder="Supplier Contact" 
-                            />
-                            {errors.contact && <p style={{ color: 'red' }}>{errors.contact}</p>}
                       </div>
                    </div>
 
@@ -199,9 +185,25 @@ const AddAndEditClient: React.FC = () => {
                              id="address" 
                              value={formData.address}
                              onChange={handleChange} 
-                             placeholder="Supplier Address" 
+                             placeholder="Customer Address" 
                           />
                           {errors.address && <p style={{ color: 'red' }}>{errors.address}</p>}
+                      </div>
+                   </div>
+
+                   <div className="col-md-6">
+                      <div className="form-group">
+                          <label htmlFor="email">Customer Email</label>
+                          <input 
+                            type="text" 
+                            className="form-control" 
+                            name="email" 
+                            id="email" 
+                            value={formData.email}
+                            onChange={handleChange} 
+                            placeholder="Customer email" 
+                            />
+                            {errors.email && <p style={{ color: 'red' }}>{errors.email}</p>}
                       </div>
                    </div>
 
@@ -215,9 +217,24 @@ const AddAndEditClient: React.FC = () => {
                              id="area" 
                              value={formData.area}
                              onChange={handleChange} 
-                             placeholder="Supplier Area" 
+                             placeholder="Customer Area" 
                           />
                           {errors.area && <p style={{ color: 'red' }}>{errors.area}</p>}
+                      </div>
+                   </div>
+
+                   <div className="col-md-6">
+                      <div className="form-group">
+                          <label htmlFor="contact">Customer Contact</label>
+                          <input type="text"
+                             className="form-control"
+                              name="contact" 
+                              id="contact"
+                              value={formData.contact}
+                              onChange={handleChange} 
+                              placeholder="Customer Contact" 
+                            />
+                            {errors.contact && <p style={{ color: 'red' }}>{errors.contact}</p>}
                       </div>
                    </div>
 
@@ -231,9 +248,26 @@ const AddAndEditClient: React.FC = () => {
                              id="city" 
                              value={formData.city}
                              onChange={handleChange} 
-                             placeholder="Supplier city" 
+                             placeholder="Customer city" 
                           />
                           {errors.city && <p style={{ color: 'red' }}>{errors.city}</p>}
+                      </div>
+                   </div>
+                   
+
+                   <div className="col-md-6">
+                      <div className="form-group">
+                          <label htmlFor="contactPersonName">Contact Person Name</label>
+                          <input 
+                              type="text" 
+                              className="form-control" 
+                              name="contactPersonName" 
+                              id="contactPersonName" 
+                              value={formData.contactPersonName}
+                              onChange={handleChange} 
+                              placeholder="Contact Person Name" 
+                            />
+                            {errors.contactPersonName && <p style={{ color: 'red' }}>{errors.contactPersonName}</p>}
                       </div>
                    </div>
 
@@ -252,23 +286,7 @@ const AddAndEditClient: React.FC = () => {
                           {errors.pincode && <p style={{ color: 'red' }}>{errors.pincode}</p>}
                       </div>
                    </div>
-
-                   <div className="col-md-6">
-                      <div className="form-group">
-                          <label htmlFor="contactPersonName">Contact Person Name</label>
-                          <input 
-                              type="text" 
-                              className="form-control" 
-                              name="contactPersonName" 
-                              id="contactPersonName" 
-                              value={formData.contactPersonName}
-                              onChange={handleChange} 
-                              placeholder="Contact Person Name" 
-                            />
-                            {errors.contactPersonName && <p style={{ color: 'red' }}>{errors.contactPersonName}</p>}
-                      </div>
-                   </div>
-
+                  
                    <div className="col-md-6">
                       <div className="form-group">
                           <label htmlFor="contactPersonContact">Contact Person Contact</label>
@@ -297,6 +315,68 @@ const AddAndEditClient: React.FC = () => {
                             onChange={handleChange} 
                             placeholder="Description" 
                           />
+                      </div>
+                   </div>
+                   <hr></hr>
+                   <br></br>
+                   <div className="col-md-6">
+                      <div className="form-group">
+                          <label htmlFor="namePerBank">Name (As per bank)</label>
+                          <input 
+                            type="text" 
+                            className="form-control" 
+                            name="namePerBank" 
+                            id="namePerBank" 
+                            value={formData.namePerBank}
+                            onChange={handleChange} 
+                            placeholder="Name" 
+                          />
+                           {errors.namePerBank && <p style={{ color: 'red' }}>{errors.namePerBank}</p>}
+                      </div>
+                   </div>
+                   <div className="col-md-6">
+                      <div className="form-group">
+                          <label htmlFor="bankAccount">Bank Account</label>
+                          <input 
+                            type="text" 
+                            className="form-control" 
+                            name="bankAccount" 
+                            id="bankAccount" 
+                            value={formData.bankAccount}
+                            onChange={handleChange} 
+                            placeholder="Bank Account" 
+                          />
+                           {errors.bankAccount && <p style={{ color: 'red' }}>{errors.bankAccount}</p>}
+                      </div>
+                   </div>
+                   <div className="col-md-6">
+                      <div className="form-group">
+                          <label htmlFor="ifsc">IFSC Code</label>
+                          <input 
+                            type="text" 
+                            className="form-control" 
+                            name="ifsc" 
+                            id="ifsc" 
+                            value={formData.ifsc}
+                            onChange={handleChange} 
+                            placeholder="IFSC Code" 
+                          />
+                           {errors.ifsc && <p style={{ color: 'red' }}>{errors.ifsc}</p>}
+                      </div>
+                   </div>
+                   <div className="col-md-6">
+                      <div className="form-group">
+                          <label htmlFor="bankBranch">Bank Branch</label>
+                          <input 
+                            type="text" 
+                            className="form-control" 
+                            name="bankBranch" 
+                            id="bankBranch" 
+                            value={formData.bankBranch}
+                            onChange={handleChange} 
+                            placeholder="Bank Branch" 
+                          />
+                           {errors.bankBranch && <p style={{ color: 'red' }}>{errors.bankBranch}</p>}
                       </div>
                    </div>
                 </div>
