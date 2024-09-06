@@ -629,6 +629,38 @@ export const getJobType = createAsyncThunk(
     }
   )
 
+  export const getAllClient = createAsyncThunk(
+    'getAllClient',
+    async (userData:any,{ rejectWithValue }) => {
+      try{
+        let response = await api.get('/common/getAllClient')
+        return response.data; 
+      }catch(error:any){
+        if (error.response) {
+          return rejectWithValue(error.response.data);
+        } else {
+          return rejectWithValue({ message: 'Network error' });
+        }
+      }  
+    }
+  )
+
+  export const getDashboardJob = createAsyncThunk(
+    'getDashboardJob',
+    async (userData:any,{ rejectWithValue }) => {
+      try{
+        let response = await api.get('/common/getDashboardJob?'+userData)
+        return response.data; 
+      }catch(error:any){
+        if (error.response) {
+          return rejectWithValue(error.response.data);
+        } else {
+          return rejectWithValue({ message: 'Network error' });
+        }
+      }  
+    }
+  )
+
   
   
 
@@ -664,7 +696,10 @@ const commonSlice = createSlice({
     inventory : [],
     jobTypeMaterialList : [],
     jobTypeMaterialDataList : [],
+    clientList : [],
     inventoryCount :0,
+    dashboardJob : [],
+    dashboardJobCount : 0,
     message : {}
   },
   reducers : {
@@ -737,8 +772,17 @@ const commonSlice = createSlice({
     }).addCase(getJobTypeMaterialDataList.fulfilled, (state, action) => {
       state.jobTypeMaterialDataList = action.payload.data;
       state.isLoading = false; 
+    }).addCase(getAllClient.fulfilled, (state, action) => {
+      state.clientList = action.payload.data;
+      state.isLoading = false; 
+    }).addCase(getDashboardJob.fulfilled, (state, action) => {
+      state.dashboardJob = action.payload.data.dashboardJob;
+      state.dashboardJobCount = action.payload.data.count;
+      state.isLoading = false; 
     })
+
     
+   
     
   },
   
